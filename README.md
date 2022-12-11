@@ -1,6 +1,8 @@
 # Create Linear Quests with QuestLine
 
-QuestLine is an open-source, stand-a-lone, module script aimed at advanced developers to minimize the complexity of building a robust quest system.
+QuestLine is an open-source, server-sided, module script aimed to minimize the complexity of building a robust quest system.
+
+The module itself doesn't include any gui elements or a reward system.  Instead, it offers a framework to create customized quest systems that are event-driven and easily maintained.
 
 ## Creating A QuestLine
 
