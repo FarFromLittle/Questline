@@ -63,8 +63,6 @@ It's possible to populate *playerData* with starter quests by assigning *0* to a
 local playerData = { myQuest = 0 }
 ```
 
-### Saving Player Progress
-
 Upon leaving the game, the player needs to be unregistered too.  This does some cleanup and returns the player's progression table to be saved in a datastore.
 
 ```lua
