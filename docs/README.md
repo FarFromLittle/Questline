@@ -2,11 +2,6 @@
 
 * [Class Members](#class-members)
   * [QuestLine.timeout](#questlinetimeout)
-  * [QuestLine.Event](#questlineevent)
-  * [QuestLine.Score](#questlinescore)
-  * [QuestLine.Timer](#questlinetimer)
-  * [QuestLine.Touch](#questlinetouch)
-  * [QuestLine.Value](#questlinevalue)
   * [QuestLine.new](#questlinenew)
   * [QuestLine.getQuestById](#questlinegetquestbyid)
   * [QuestLine.register](#questlineregister)
@@ -37,36 +32,6 @@
 |Type|Default|Description
 |-:|:-:|:-
 |number|1.0|Determines the transition time between one objective and the next.  Measured in seconds.
-
-### QuestLine.Event
-
-|Type|Default|Description
-|-:|:-:|:-
-|string|"event"|`readonly` Enum for the *event* objective type.
-
-### QuestLine.Score
-
-|Type|Default|Description
-|-:|:-:|:-
-|string|"score"|`readonly` Enum for the *score* objective type.
-
-### QuestLine.Timer
-
-|Type|Default|Description
-|-:|:-:|:-
-|string|"timer"|`readonly` Enum for the *timer* objective type.
-
-### QuestLine.Touch
-
-|Type|Default|Description
-|-:|:-:|:-
-|string|"touch"|`readonly` Enum for the *touch* objective type.
-
-### QuestLine.Value
-
-|Type|Default|Description
-|-:|:-:|:-
-|string|"value"|`readonly` Enum for the *value* objective type.
 
 ### QuestLine.new
 
@@ -269,4 +234,34 @@ Retrieves a player's progression for the entire quest, not just the current obje
 |number| The progress of the *player* within the quest.
 
 ## Objectives Types
+
+### Event
+
+|Type|Default|Description
+|-:|:-:|:-
+|string|"event"|`readonly` Enum for the *event* objective type.
+
+### Score
+
+|Type|Default|Description
+|-:|:-:|:-
+|string|"score"|`readonly` Enum for the *score* objective type.
+
+### Timer
+
+|Type|Default|Description
+|-:|:-:|:-
+|string|"timer"|`readonly` Enum for the *timer* objective type.
+
+### Touch
+
+|Type|Default|Description
+|-:|:-:|:-
+|string|"touch"|`readonly` Enum for the *touch* objective type.
+
+### Value
+
+|Type|Default|Description
+|-:|:-:|:-
+|string|"value"|`readonly` Enum for the *value* objective type.
 
