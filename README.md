@@ -6,7 +6,7 @@ The module itself doesn't include any gui elements or a reward system.  Instead,
 
 ## Creating A QuestLine
 
-A quest is first created by passing in two arguments.  The first being an unique identifier for the questline within the player's progression table.  The second parameter is a table to store data related to the quest (referenced by *self* in an event listener).
+A quest is first created by passing in two arguments.  The first being an unique identifier for the questline within the player's progression table.  Then, a table to store data related to the quest (referenced by *self* in an event listener).
 
 ```lua
 local myQuest = QuestLine.new("myQuest", { Title = "My First Quest" })
@@ -17,30 +17,26 @@ local myQuest = QuestLine.new("myQuest", { Title = "My First Quest" })
 Now you need to construct the questline by adding a series of objectives using *AddObjective*.
 
 ```lua
-local obj, val = QuestLine.Score("Coins", 10)
-myQuest:AddObjective(obj, val)
-
--- or more simply
-myQuest:AddObjective(QuestLine.Score("Coins", 10))
+myQuest:AddObjective(QuestLine.Score, "Coins", 10)
 ```
 
-Notice how *AddObjective* accepts two arguments.  A *thread* and an integer representing the value of the objective.  Both are returned from a call to one of the following objectives.
+A current list of objectives are:
 
 ```lua
 -- A generic, signal-based objective
-QuestLine.Event(event:RBXScriptSignal, count:number?)
+myQuest:AddObjective(QuestLine.Event, event, count)
 
 -- An objective based on the value of a leaderstat
-QuestLine.Score(name:string, amount:number)
+myQuest:AddObjective(QuestLine.Score, name, amount)
 
 -- A time-based objective, measured in seconds
-QuestLine.Timer(sec:number, one:boolean?)
+myQuest:AddObjective(QuestLine.Timer, sec, one)
 
 -- A simple touch-based objective
-QuestLine.Touch(touchPart:Basepart)
+myQuest:AddObjective(QuestLine.Touch, touchPart)
 
 -- An objective linked to an *IntValue*
-QuestLine.Value(intValue:IntValue, amount:number)
+myQuest:AddObjective(QuestLine.Value, intValue, amount)
 ```
 
 ## Assigning Quests
@@ -48,7 +44,7 @@ QuestLine.Value(intValue:IntValue, amount:number)
 Players must first be registered with the system before being assigned any quests.
 
 ```lua
-QuestLine.registerPlayer(player:Player, playerData:{[string]:number})
+QuestLine.registerPlayer(player, playerData)
 ```
 
 Here, *playerData* refers to the player's progression table loaded from a datastore.
@@ -78,24 +74,25 @@ Player progress is stored in a table where the _key_ is a string (which is suppl
 One way to track progression is to reassign the event listeners on the class itself.  This allows you to listen for changes on a global level.  The quest itself will still be available via *self*.
 
 ```lua
-function QuestLine:Accepted(player)
+function QuestLine:OnAccept(player)
 	-- Player has accepted a previously unknown quest
 end
 
-function QuestLine:Assigned(player, progress, index)
+function QuestLine:OnAssign(player, progress, index)
 	-- Player has accepted or resumed an incomplete quest
 end
 
-function QuestLine:Canceled(player)
+function QuestLine:OnCancel(player)
 	-- Only triggered after calling Cancel on a quest
 end
 
-function QuestLine:Completed(player)
+function QuestLine:OnComplet(player)
 	-- All objectives have been passed
 end
 
-function QuestLine:Progressed(player, progress, index)
+function QuestLine:OnProgress(player, progress, index)
 	-- Called upon each step of progression
 end
 ```
+
 Additionally, these events can also be overridden on the quest itself to track progress per questline.
