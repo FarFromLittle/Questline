@@ -142,7 +142,7 @@ Causes the *player* to cancel/fail the current quest.  Triggers the *OnCancel* e
 |:-|:-|:-
 |*player*|Player| The player to cancel the quest on.
 
-#### IsAccepted
+### IsAccepted
 
 ```lua
 if myQuest:IsAccepted(player) then
@@ -156,7 +156,7 @@ Checks if the quest is accepted by the *player*.  A quest is only accepted when 
 |:-|:-|:-
 |*player*|Player| The player to query.
 
-#### IsCanceled
+### IsCanceled
 
 ```lua
 if myQuest:IsCanceled(player) then
