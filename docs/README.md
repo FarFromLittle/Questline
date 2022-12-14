@@ -1,41 +1,46 @@
 # QuestLine API Documentation
 
-## Members
+## Class Members
 
-### QuestLine.timeout
+### Static Class Members
+
+#### QuestLine.timeout
+
 |Type|Default|Description
 |-:|:-:|:-
 |number|1.0|Determines the transition time between one objective and the next.  Measured in seconds.
 
-### QuestLine.Event
+#### QuestLine.Event
+
 |Type|Default|Description
 |-:|:-:|:-
 |string|"event"|`readonly` Enum for the *event* objective type.
 
-### QuestLine.Score
+#### QuestLine.Score
+
 |Type|Default|Description
 |-:|:-:|:-
 |string|"score"|`readonly` Enum for the *score* objective type.
 
-### QuestLine.Timer
+#### QuestLine.Timer
+
 |Type|Default|Description
 |-:|:-:|:-
 |string|"timer"|`readonly` Enum for the *timer* objective type.
 
-### QuestLine.Touch
+#### QuestLine.Touch
+
 |Type|Default|Description
 |-:|:-:|:-
 |string|"touch"|`readonly` Enum for the *touch* objective type.
 
-### QuestLine.Value
+#### QuestLine.Value
+
 |Type|Default|Description
 |-:|:-:|:-
 |string|"value"|`readonly` Enum for the *value* objective type.
 
-
-## Methods
-
-### QuestLine.new
+#### QuestLine.new
 
 ```lua
 local myQuest = QuestLine.new("myQuestId", {...})
@@ -52,7 +57,7 @@ Creates a new questline.  Returns *self* (if provided) with it's metatable set t
 |-:|:-
 |*QuestLine*| A new *QuestLine* object.
 
-### QuestLine.getQuestById
+#### QuestLine.getQuestById
 
 ```lua
 local myQuest = QuestLine.getQuestById("myQuestId")
@@ -68,7 +73,7 @@ Returns a quest created with the given *questId*.
 |-:|:-
 |*QuestLine*| The quest identified by *questId*.
 
-### QuestLine.register
+#### QuestLine.register
 
 ```lua
 -- Load data from datastore
@@ -86,7 +91,7 @@ Registers a player with the quest system and loads the player's progression data
 |*player*|Player| The player to add to the quest system.
 |*playerData*|{[string]:number}| The player's progression table.
 
-### QuestLine.unregister
+#### QuestLine.unregister
 
 ```lua
 local playerData = QuestLine.unregister(player)
@@ -102,7 +107,9 @@ Unregisters the player from the quest system and returns the player's progressio
 |:-|:-
 |{[string]:number}| The player's progression table.
 
-### AddObjective
+### Public Class Members
+
+#### AddObjective
 
 ```lua
 local index = myQuest:AddObjective(objType, ...)
@@ -118,7 +125,7 @@ Adds a new objective according to the supplied *Objective* type.  Additional par
 |:-|:-
 |number| The index of the created objective within the *Questline*.
 
-### Assign
+#### Assign
 
 ```lua
 myQuest:Assign(player)
@@ -130,7 +137,7 @@ Assigns a *player* to a quest.  Triggers *OnAccept* if the quest was previously 
 |:-|:-|:-
 |*player*|Player| The player to assign to the quest.
 
-### Cancel
+#### Cancel
 
 ```lua
 myQuest:Cancel(player)
@@ -142,7 +149,7 @@ Causes the *player* to cancel/fail the current quest.  Triggers the *OnCancel* e
 |:-|:-|:-
 |*player*|Player| The player to cancel the quest on.
 
-### IsAccepted
+#### IsAccepted
 
 ```lua
 if myQuest:IsAccepted(player) then
@@ -156,7 +163,7 @@ Checks if the quest is accepted by the *player*.  A quest is only accepted when 
 |:-|:-|:-
 |*player*|Player| The player to query.
 
-### IsCanceled
+#### IsCanceled
 
 ```lua
 if myQuest:IsCanceled(player) then
@@ -170,7 +177,7 @@ Checks if the quest is canceled for the *player*.
 |:-|:-|:-
 |*player*|Player| The player to query.
 
-### IsComplete
+#### IsComplete
 
 ```lua
 if myQuest:IsCompete(player) then
@@ -184,7 +191,7 @@ Checks if the *player* has completed the quest.
 |:-|:-|:-
 |*player*|Player| The player to query.
 
-### GetCurrentProgress
+#### GetCurrentProgress
 
 ```lua
 local currentProgress, index = myQuest:GetCurrentProgress(player)
@@ -201,7 +208,7 @@ Retrieves an objective's progress for a player.  Reference [*GetObjectiveValue*]
 |number| The current progress of the *player* within the objective.
 |number| The index of the current objective within the *Questline*.
 
-### GetObjectiveValue
+#### GetObjectiveValue
 
 ```lua
 local value = myQuest:GetObjectiveValue(index)
@@ -217,7 +224,7 @@ Retrieves an objective's total progress needed to pass.
 |:-|:-
 |number| The objective's maximum progression.
 
-### GetProgress
+#### GetProgress
 
 ```lua
 local progress = myQuest:GetProgress(player)
