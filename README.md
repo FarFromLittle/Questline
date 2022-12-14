@@ -1,8 +1,6 @@
-# Create Linear Quests with QuestLine
+# Create Roblox Quests with QuestLine
 
-QuestLine is an open-source, server-sided, module script aimed to minimize the complexity of building a robust quest system.
-
-The module itself doesn't include any gui elements or a reward system.  Instead, it offers a framework to create customized quest systems that are event-driven and easily maintained.
+QuestLine is an open-source, server-sided, module script aimed to minimize the complexity of building a robust quest system.  The module itself doesn't include a save or reward system.  Instead, it offers a framework to create customized quest systems that are event-driven and easily maintained.
 
 ## Creating A QuestLine
 
