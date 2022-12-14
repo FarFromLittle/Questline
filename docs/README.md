@@ -1,11 +1,11 @@
 ## Table of Contents
 
 * [Class Members](#class-members)
-  * [QuestLine.timeout](#questlinetimeout)
-  * [QuestLine.new](#questlinenew)
-  * [QuestLine.getQuestById](#questlinegetquestbyid)
-  * [QuestLine.register](#questlineregister)
-  * [QuestLine.unregister](#questlineunregister)
+  * [timeout](#timeout)
+  * [new](#new)
+  * [getQuestById](#getquestbyid)
+  * [register](#register)
+  * [unregister](#unregister)
 
 * [Public Members](#public-methods)
   * [AddObjective](#addobjective)
@@ -27,13 +27,13 @@
 
 ## Class Members
 
-### QuestLine.timeout
+### timeout
 
 |Type|Default|Description
 |-:|:-:|:-
 |number|1.0|Determines the transition time between one objective and the next.  Measured in seconds.
 
-### QuestLine.new
+### new
 
 ```lua
 local myQuest = QuestLine.new("myQuestId", {...})
@@ -50,7 +50,7 @@ Creates a new questline.  Returns *self* (if provided) with it's metatable set t
 |-:|:-
 |*QuestLine*| A new *QuestLine* object.
 
-### QuestLine.getQuestById
+### getQuestById
 
 ```lua
 local myQuest = QuestLine.getQuestById("myQuestId")
@@ -66,7 +66,7 @@ Returns a quest created with the given *questId*.
 |-:|:-
 |*QuestLine*| The quest identified by *questId*.
 
-### QuestLine.register
+### register
 
 ```lua
 -- Load data from datastore
@@ -84,7 +84,7 @@ Registers a player with the quest system and loads the player's progression data
 |*player*|Player| The player to add to the quest system.
 |*playerData*|{[string]:number}| The player's progression table.
 
-### QuestLine.unregister
+### unregister
 
 ```lua
 local playerData = QuestLine.unregister(player)
@@ -108,7 +108,7 @@ Unregisters the player from the quest system and returns the player's progressio
 local index = myQuest:AddObjective(objType, ...)
 ```
 
-Adds a new objective according to the supplied *Objective* type.  Additional parameters are determined by the objective you wish to add.  See the objectives section [here](#Objectives).
+Adds a new objective according to the supplied *Objective* type.  Additional parameters are determined by the objective you wish to add.  See the objectives section [here](#objective-types).
 
 |Parameter|Type|Description
 |:-|:-|:-
