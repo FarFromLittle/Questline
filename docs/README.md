@@ -1,5 +1,12 @@
 ## Table of Contents
 
+* [Objectives](#objectives)
+  * [Event](#event)
+  * [Score](#score)
+  * [Timer](#timer)
+  * [Touch](#touch)
+  * [Value](#value)
+
 * [Class Members](#class-members)
   * [timeout](#timeout)
   * [new](#new)
@@ -7,7 +14,7 @@
   * [register](#register)
   * [unregister](#unregister)
 
-* [Public Members](#public-methods)
+* [Public Methods](#public-methods)
   * [AddObjective](#addobjective)
   * [Assign](#assign)
   * [Cancel](#cancel)
@@ -18,20 +25,91 @@
   * [GetObjectiveValue](#getobjectivevalue)
   * [GetProgress](#getprogress)
 
-* [Objective Types](#objective-types)
-  * [Event](#event)
-  * [Score](#score)
-  * [Timer](#timer)
-  * [Touch](#touch)
-  * [Value](#value)
+## Objectives
+
+### Event
+
+`string` `default="event"` `readonly` Objective attached to a Roblox event.
+
+```lua
+myQuest:AddObjective(QuestLine.Event, workspace.Door.Knock.MouseClicked, 3)
+```
+
+Parameters include:
+
+|Parameter|Type|Default|Description
+|-:|:-:|:-:|:-
+|event|RBXScriptSignal|*required*| Progresses when the event is fired for the player.
+|count|number|1| Number of times the event should be triggered.
+
+### Score
+
+`string` `default="score"` `readonly` Objective based on a leaderstat.
+
+```lua
+-- Score 10 "Points"
+myQuest:AddObjective(QuestLine.Score, "Points", 10)
+```
+
+Parameters include:
+
+|Parameter|Type|Default|Description
+|-:|:-:|:-:|:-
+|name|string|*required*| The name of the leaderstat to track.
+|amount|number|*required*| Value to consider complete.
+
+### Timer
+
+`string` `default="timer"` `readonly` Objective run on a timer.
+
+```lua
+-- Wait 3 seconds, progress in steps
+myQuest:AddObjective(QuestLine.Timer, 3, true)
+```
+
+Parameters include:
+
+|Parameter|Type|Default|Description
+|-:|:-:|:-:|:-
+|count|number|*required*| Number of seconds to wait.
+|once|boolean|false| Controls whether progress is tracked for each second, or *once* for all.
+
+### Touch
+
+`string` `default="touch"` `readonly` Objective based on a touch event.
+
+```lua
+-- Return to dropoff
+myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
+```
+
+Parameters include:
+
+|Parameter|Type|Default|Description
+|-:|:-:|:-:|:-
+|touchPart|BasePart|*required*| A touchable part within the workspace.
+
+### Value
+
+`string` `default="value"` `readonly` Objective based on an IntValue.
+
+```lua
+-- Track kills
+myQuest:AddObjective(QuestLine.Value, player.EnemiesKilled, 5)
+```
+
+Parameters include:
+
+|Parameter|Type|Default|Description
+|-:|:-:|:-:|:-
+|intVal|IntValue|*required*| A reference to an IntValue.
+|count|number|*required*| Value to consider complete.
 
 ## Class Members
 
 ### timeout
 
-|Type|Default|Description
-|-:|:-:|:-
-|number|1.0|Determines the transition time between one objective and the next.  Measured in seconds.
+`number` `default=1.0` Determines the transition time between one objective and the next.  Measured in seconds.
 
 ### new
 
@@ -232,36 +310,3 @@ Retrieves a player's progression for the entire quest, not just the current obje
 |Returns|Description
 |:-|:-
 |number| The progress of the *player* within the quest.
-
-## Objectives Types
-
-### Event
-
-|Type|Default|Description
-|-:|:-:|:-
-|string|"event"|`readonly` Enum for the *event* objective type.
-
-### Score
-
-|Type|Default|Description
-|-:|:-:|:-
-|string|"score"|`readonly` Enum for the *score* objective type.
-
-### Timer
-
-|Type|Default|Description
-|-:|:-:|:-
-|string|"timer"|`readonly` Enum for the *timer* objective type.
-
-### Touch
-
-|Type|Default|Description
-|-:|:-:|:-
-|string|"touch"|`readonly` Enum for the *touch* objective type.
-
-### Value
-
-|Type|Default|Description
-|-:|:-:|:-
-|string|"value"|`readonly` Enum for the *value* objective type.
-
