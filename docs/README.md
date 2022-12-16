@@ -397,7 +397,7 @@ Checks if the *player* has completed the quest.
 
 `myQuest:GetCurrentProgress(player:Player):(number, number)`
 
-Retrieves an objective's progress for a player.  Reference [*GetObjectiveValue*](#GetObjectiveValue) to get the total progress needed to continue.
+Retrieves an objective's progress for a player.
 
 |Parameter|Type    |Default     |Description
 |--------:|:------:|:----------:|:----------
