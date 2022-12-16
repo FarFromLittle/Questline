@@ -291,7 +291,7 @@ function QuestLine:Assign(player:Player)
 		if prg and currentProgress < prg then
 			progress += prg - currentProgress
 			
-			playerProgress[player][tostring(self)] = progress
+			playerProgress[player][questIndex[self]] = progress
 			
 			currentProgress = prg
 			
@@ -356,9 +356,7 @@ function QuestLine:GetObjectiveValue(index)
 end
 
 function QuestLine:GetProgress(player:Player)
-	local progress = playerProgress[player]
-	
-	return if progress ~= nil then progress[questIndex[self]] else 0
+	return if playerProgress[player] ~= nil then playerProgress[player][questIndex[self]] else 0
 end
 
 function QuestLine:IsAccepted(player:Player):boolean
@@ -366,11 +364,11 @@ function QuestLine:IsAccepted(player:Player):boolean
 end
 
 function QuestLine:IsCanceled(player:Player):boolean
-	return playerProgress[player] ~= nil and playerProgress[player][questIndex[self]] < 0
+	return self:IsAccepted(player) and playerProgress[player][questIndex[self]] < 0
 end
 
 function QuestLine:IsComplete(player)
-	return playerProgress[player] ~= nil and objectiveCount[self] <= playerProgress[player][questIndex[self]]
+	return self:IsAccepted(player) and objectiveCount[self] <= playerProgress[player][questIndex[self]]
 end
 
 return QuestLine
