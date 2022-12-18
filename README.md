@@ -1,8 +1,4 @@
-# Create Roblox Quests with QuestLine
-
-QuestLine is an open-sourced toolkit aimed at minimizing the complexity of building a robust quest system. It offers a framework to create customized quest systems that are event-driven and easily maintained.
-
-## Creating A QuestLine
+# Getting Started
 
 A quest is first created by passing in two arguments.  The first being an unique identifier for the questline within the player's progression table.  Then, a table to store data related to the quest (referenced by *self* in an event listener).
 
