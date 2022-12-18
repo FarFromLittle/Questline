@@ -1,12 +1,10 @@
-theme: minima
 title: QuestLine
 author:
   name: FarFromLittle
   email: mail.winston@yahoo.com
 description: QuestLine is an open-source, stand-alone module that minimizes the complexity of building a robust quest system. It offers a framework to create customized quest systems that are event-driven and easily maintained.
 
-nav:
- - docs
+theme: minima
 
 minima:
   skin: auto
