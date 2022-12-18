@@ -72,7 +72,7 @@ function QuestLine:OnAccept(player)
 	-- Player has accepted a previously unknown quest
 end
 
-function QuestLine:OnAssign(player, progress, index)
+function QuestLine:OnAssign(player)
 	-- Player has accepted or resumed an incomplete quest
 end
 
