@@ -1,4 +1,4 @@
-theme: minima-auto
+theme: minima
 title: QuestLine
 author:
   name: FarFromLittle
@@ -7,3 +7,6 @@ description: QuestLine is an open-source, stand-alone module that minimizes the 
 
 nav:
  - docs
+
+minima:
+  skin: auto
