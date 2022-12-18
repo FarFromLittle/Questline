@@ -1,6 +1,4 @@
-# QuestLine Documentation
-
-## Table of Contents
+# Documentation
 
 [**Enums**](#enums)
 * [QuestLine.Event](#questlineevent)
