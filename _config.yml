@@ -2,9 +2,11 @@ title: QuestLine
 description: QuestLine is an open-source, stand-alone module that minimizes the complexity of building a robust quest system. It offers a framework to create customized quest systems that are event-driven and easily maintained.
 
 theme: minima
-minima_skin: auto
+minima:
+  skin: auto
 
 markdown: kramdown
 highlighter: rouge
 titles_from_headings: false
 og_image: /file/Q.png
+page_excerpts: true
