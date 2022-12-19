@@ -6,8 +6,8 @@ minima:
   skin: dark
 
 page_headers:
-  - Getting Started: /
-  - API: /docs/
+  - Getting Started: README.md
+  - API: docs/README.md
 
 markdown: kramdown
 highlighter: rouge
