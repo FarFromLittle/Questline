@@ -3,7 +3,11 @@ description: QuestLine is an open-source, stand-alone module that minimizes the 
 
 theme: minima
 minima:
-  skin: auto
+  skin: dark
+
+page_headers:
+  - Getting Started: /
+  - API: /docs/
 
 markdown: kramdown
 highlighter: rouge
