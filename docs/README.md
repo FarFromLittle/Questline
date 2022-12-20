@@ -1,3 +1,5 @@
+[Getting Started](https://farfromlittle.github.io/QuestLine/)
+
 # Documentation
 
 [**Enums**](#enums)
