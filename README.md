@@ -1,3 +1,5 @@
+[API Documentation](https://farfromlittle.github.io/QuestLine/docs/)
+
 # Getting Started
 
 A quest is first created by passing in two arguments.  The first being an unique identifier for the questline within the player's progression table.  Then, a table to store data related to the quest (referenced by *self* in an event listener).
