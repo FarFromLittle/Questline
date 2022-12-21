@@ -1,8 +1,9 @@
 # Getting Started
 
 QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of quests.
+
 The module itself does not include data storage or visual elements.
-However, you can find an example of a quest tracking system [here](https://github.com/FarFromLittle/QuestLine/).
+However, you can download an example quest tracking system [here](https://github.com/FarFromLittle/QuestLine/blob/main/QuestLineExample.rbxl).
 
 ## Creating QuestLines
 
@@ -23,9 +24,9 @@ The following adds an objective to touch a part in the workspace named *TouchPar
 myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 ```
 
-There are a total five objective types and can be found [here](https://farfromlittle.github.io/QuestLine/docs/#enums).
+There are a total five objective types and can be found [here](https://farfromlittle.github.io/QuestLine/types/).
 
-## Player Set-Up
+## Adding Players
 
 Players must first register with the system before being assigned a questline.
 
@@ -46,13 +47,24 @@ local playerData = {
 
 ## Assigning QuestLines
 
-The player is now ready to start accepting quests.
+Once a player is registered, they are ready to be assigned quests.
 
 ```lua
 myQuest:Assign(player)
 ```
 
+This enables the system to fire the appropriate events as the player progresses.
+
 ## Handling Progression
+
+Events are fired in the following order:
+* *OnAccept()* will only fire if a player is assigned a previously unknown questline.  This would be useful for giving out quest items.
+* *OnAssign()* fires each time a player is assigned a questline.  This could be when a player resumes progress from a previous session.
+* *OnProgress()* happens at each step of progression.  This includes a progress of zero when initialized.  Useful for updating gui elements.
+* *OnCancel()* only happens with a call to *Cancel()*.  A questline can be restarted after being canceled.  Can be used to fail a questline.
+* *OnComplete()*, as expected, fires when a player has completed the questline.
+
+See the section on [events](https://farfromlittle.github.io/QuestLine/events/) for more details.
 
 To track player progression, you must override the appropriate event listeners.
 
@@ -63,8 +75,6 @@ end
 ```
 
 Event listeners can be assigned per questline or on the class itself to globally track progress.
-
-The available events are listed [here](https://farfromlittle.github.io/QuestLine/docs/#onaccept).
 
 ## Removing Players
 
