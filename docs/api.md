@@ -1,4 +1,4 @@
-# API Documentation
+# API
 
 [**Enums**](#enums)
 * [QuestLine.Event](#questlineevent)
@@ -46,6 +46,7 @@ Objective triggered by a roblox signal.
     local trigger = workspace.Wood.ClickDetector.MouseClicked
     myQuest:AddObjective(QuestLine.Event, trigger, 3)
 ```
+
 </details>
 
 --------------------------------------------------------------------------------
