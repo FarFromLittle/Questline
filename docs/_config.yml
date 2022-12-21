@@ -7,4 +7,5 @@ og_image: Q.png
 theme: minima
 markdown: kramdown
 highlighter: rouge
-jekyll-titles-from-headings: false
+
+titles_from_headings: false
