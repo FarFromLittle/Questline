@@ -3,7 +3,8 @@
 QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of quests.
 
 The module itself does not include data storage or visual elements.
-However, you can download an example quest tracking system [here](https://github.com/FarFromLittle/QuestLine/blob/main/QuestLineExample.rbxl).
+
+However, you can download the example above which includes a simple quest tracking system.
 
 ## Creating QuestLines
 
@@ -24,7 +25,7 @@ The following adds an objective to touch a part in the workspace named *TouchPar
 myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 ```
 
-There are a total five objective types and can be found [here](https://farfromlittle.github.io/QuestLine/types/).
+There are a total five objective types and are outlined [here](https://farfromlittle.github.io/QuestLine/#types).
 
 ## Adding Players
 
@@ -64,7 +65,7 @@ Events are fired in the following order:
 * *OnCancel()* only happens with a call to *Cancel()*.  A questline can be restarted after being canceled.  Can be used to fail a questline.
 * *OnComplete()*, as expected, fires when a player has completed the questline.
 
-See the section on [events](https://farfromlittle.github.io/QuestLine/events/) for more details.
+See the section on [events](https://farfromlittle.github.io/QuestLine/#events) for more details.
 
 To track player progression, you must override the appropriate event listeners.
 
