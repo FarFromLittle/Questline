@@ -1,6 +1,4 @@
-[Getting Started](https://farfromlittle.github.io/QuestLine/)
-
-# Documentation
+# API Documentation
 
 [**Enums**](#enums)
 * [QuestLine.Event](#questlineevent)
