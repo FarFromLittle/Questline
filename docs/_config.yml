@@ -1,4 +1,10 @@
 title: QuestLine
+Author:
+  Name: FarFromLittle
 description: QuestLine offers a framework to create customized quest systems that are event-driven and easily maintained.
-theme: minima
 og_image: Q.png
+
+theme: minima
+markdown: kramdown
+highlighter: rouge
+jekyll-titles-from-headings: false
