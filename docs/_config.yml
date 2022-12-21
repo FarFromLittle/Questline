@@ -5,7 +5,7 @@ description: QuestLine offers a framework to create customized quest systems tha
 og_image: Q.png
 
 theme: minima
-markdown: kramdown
+markdown: GFM
 highlighter: rouge
 
 titles_from_headings:
