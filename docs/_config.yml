@@ -8,4 +8,7 @@ theme: minima
 markdown: kramdown
 highlighter: rouge
 
-titles_from_headings: false
+titles_from_headings:
+  enabled:     true
+  strip_title: true
+  collections: false
