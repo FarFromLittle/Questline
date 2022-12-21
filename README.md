@@ -1,94 +1,76 @@
-[API Documentation](https://farfromlittle.github.io/QuestLine/docs/)
-
 # Getting Started
 
-A quest is first created by passing in two arguments.  The first being an unique identifier for the questline within the player's progression table.  Then, a table to store data related to the quest (referenced by *self* in an event listener).
+QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of quests.
+The module itself does not include data storage or visual elements.
+However, you can find an example of a quest tracking system [here](https://github.com/FarFromLittle/QuestLine/).
+
+## Creating QuestLines
+
+To create a new questline, call `QuestLine.new()`, passing in a *questId*.
+The *questId* is an unique string that identifies the questline within the system.
 
 ```lua
-local myQuest = QuestLine.new("myQuest", { Title = "My First Quest" })
+local myQuest = QuestLine.new("myQuestId")
 ```
 
 ## Adding Objectives
 
-Now you need to construct the questline by adding a series of objectives using *AddObjective*.
+Once a questline is created, we can begin adding objectives.  This is done using the *AddObjective()* method.
+
+The following adds an objective to touch a part in the workspace named *TouchPart*.
 
 ```lua
-myQuest:AddObjective(QuestLine.Score, "Coins", 10)
+myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 ```
 
-A current list of objectives are:
+There are a total five objective types and can be found [here](https://farfromlittle.github.io/QuestLine/docs/#enums).
 
-```lua
--- A generic, signal-based objective
-myQuest:AddObjective(QuestLine.Event, event, count)
+## Player Set-Up
 
--- An objective based on the value of a leaderstat
-myQuest:AddObjective(QuestLine.Score, name, amount)
-
--- A time-based objective, measured in seconds
-myQuest:AddObjective(QuestLine.Timer, sec, one)
-
--- A simple touch-based objective
-myQuest:AddObjective(QuestLine.Touch, touchPart)
-
--- An objective linked to an *IntValue*
-myQuest:AddObjective(QuestLine.Value, intValue, amount)
-```
-
-## Assigning Quests
-
-Players must first be registered with the system before being assigned any quests.
+Players must first register with the system before being assigned a questline.
 
 ```lua
 QuestLine.registerPlayer(player, playerData)
 ```
 
-Here, *playerData* refers to the player's progression table loaded from a datastore.
+Player progression is stored in a table where progress is stored under the key supplied by *questId*.
+This would normaly be loaded from a datastore.
 
-After the player is registered, you can begin assigning them to your questlines:
+Additionaly, this table can be populated with starter quests by assigned zero to an entry.
+
+```lua
+local playerData = {
+	myQuestId = 0 -- Assign zero for auto-accept
+}
+```
+
+## Assigning QuestLines
+
+The player is now ready to start accepting quests.
 
 ```lua
 myQuest:Assign(player)
 ```
 
-It's possible to populate *playerData* with starter quests by assigning *0* to a quest's id.
+## Handling Progression
+
+To track player progression, you must override the appropriate event listeners.
 
 ```lua
-local playerData = { myQuest = 0 }
+function myQuest:OnComplete(plr)
+	print(plr.Name, "completed", self)
+end
 ```
 
-Upon leaving the game, the player needs to be unregistered too.  This does some cleanup and returns the player's progression table to be saved in a datastore.
+Event listeners can be assigned per questline or on the class itself to globally track progress.
+
+The available events are listed [here](https://farfromlittle.github.io/QuestLine/docs/#onaccept).
+
+## Removing Players
+
+Upon leaving the game, the player needs to be unregistered too.
+This does a bit of cleanup and returns the player's progress to be saved in a datastore.
 
 ```lua
 local playerData = QuestLine.unregisterPlayer(player)
 ```
-
-Player progress is stored in a table where the _key_ is a string (which is supplied by _questId_) and the _value_ is an integer representing progression.
-
-## Handling Progression
-
-One way to track progression is to reassign the event listeners on the class itself.  This allows you to listen for changes on a global level.  The quest itself will still be available via *self*.
-
-```lua
-function QuestLine:OnAccept(player)
-	-- Player has accepted a previously unknown quest
-end
-
-function QuestLine:OnAssign(player)
-	-- Player has accepted or resumed an incomplete quest
-end
-
-function QuestLine:OnCancel(player)
-	-- Only triggered after calling Cancel on a quest
-end
-
-function QuestLine:OnComplet(player)
-	-- All objectives have been passed
-end
-
-function QuestLine:OnProgress(player, progress, index)
-	-- Called upon each step of progression
-end
-```
-
-Additionally, these events can also be overridden on the quest itself to track progress per questline.
