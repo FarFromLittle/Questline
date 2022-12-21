@@ -38,11 +38,15 @@ Objective triggered by a roblox signal.
 |  *event*|`RBXScriptSignal`|*[required]*| A roblox signal.
 |  *count*|`number`         |1           | Expected trigger count.
 
+<details>
+<summary>Example</summary>
+
 ```lua
     -- Knock on wood
     local trigger = workspace.Wood.ClickDetector.MouseClicked
     myQuest:AddObjective(QuestLine.Event, trigger, 3)
 ```
+</details>
 
 --------------------------------------------------------------------------------
 
