@@ -1,6 +1,6 @@
 # QuestLine API
 
-[**Enums**](#enums)
+[**Types**](#types)
 * [QuestLine.Event](#questlineevent)
 * [QuestLine.Score](#questlinescore)
 * [QuestLine.Timer](#questlinetimer)
@@ -32,7 +32,7 @@
 * [OnComplete()](#oncomplete)
 * [OnProgress()](#onprogress)
 
-## Enums
+## Types
 
 ### QuestLine.Event
 
