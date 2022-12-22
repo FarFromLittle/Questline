@@ -1,6 +1,6 @@
 # Getting Started
 
-QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of quests.
+QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of linear quests.
 
 The module itself does not include data storage or visual elements.
 
