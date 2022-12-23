@@ -4,11 +4,11 @@ QuestLine is a server-sided module script that aids in the creation, assignment,
 
 The module itself does not include data storage or visual elements.
 
-However, you can download the example above which includes a simple quest tracking system.
+Instead, it offers a framework to create customized quest systems that are event-driven and easily maintained.
 
 ## Creating QuestLines
 
-To create a new questline, call `QuestLine.new()`, passing in a *questId*.
+To create a new questline, call *new()*, passing in a *questId*.
 The *questId* is an unique string that identifies the questline within the system.
 
 ```lua
@@ -17,15 +17,15 @@ local myQuest = QuestLine.new("myQuestId")
 
 ## Adding Objectives
 
-Once a questline is created, we can begin adding objectives.  This is done using the *AddObjective()* method.
+Once a questline is created, we can begin adding objectives.  This is done using *AddObjective()*.
 
-The following adds an objective to touch a part in the workspace named *TouchPart*.
+The following adds an objective to touch a part named *TouchPart*.
 
 ```lua
 myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 ```
 
-There are a total five objective types and are outlined [here](https://farfromlittle.github.io/QuestLine/#types).
+There are a total five objective types.  Check out [objectives](https://farfromlittle.github.io/QuestLine/#objectives) for more.
 
 ## Adding Players
 
@@ -58,11 +58,13 @@ This enables the system to fire the appropriate events as the player progresses.
 
 ## Handling Progression
 
+Progression is tracked using a system of callbacks related to the various stages.
+
 Events are fired in the following order:
-* *OnAccept()* will only fire if a player is assigned a previously unknown questline.  This would be useful for giving out quest items.
-* *OnAssign()* fires each time a player is assigned a questline.  This could be when a player resumes progress from a previous session.
-* *OnProgress()* happens at each step of progression.  This includes a progress of zero when initialized.  Useful for updating gui elements.
-* *OnCancel()* only happens with a call to *Cancel()*.  A questline can be restarted after being canceled.  Can be used to fail a questline.
+* *OnAccept()* fires when a player is assigned a previously unknown questline.
+* *OnAssign()* fires each time a player is assigned a questline.
+* *OnProgress()* happens at each step of progression.
+* *OnCancel()* only happens with a call to *Cancel()*.
 * *OnComplete()*, as expected, fires when a player has completed the questline.
 
 See the section on [events](https://farfromlittle.github.io/QuestLine/#events) for more details.
