@@ -34,8 +34,6 @@
 
 ## Objectives
 
---------------------------------------------------------------------------------
-
 ### QuestLine.Event
 
 `readonly` `string:"event"`
@@ -420,47 +418,6 @@ Retrieves a player's progression for the entire quest, not just the current obje
 --------------------------------------------------------------------------------
 
 ## Events
-
-Events are processed through callbacks related to various stages of progress.  A typical questline is managed by a global callback.  
-
-The following assigns a global callback that fires for every questline completed.
-
-```lua
--- Define a global complete callback
-function QuestLine:OnComplete(player)
-    print(plr.Name, "completed", player)
-end
-```
-
-Local callbacks can also be defined on individual questlines, but you may need to make a call to the global one as well.
-
-The global callback will not run when a local one has been assigned.  This makes it necessary to do it manually.
-
-```lua
-local myQuest = QuestLine.new("myQuestId")
-
-function myQuest:OnComplete(player)
-    -- Call global callback
-    QuestLine.OnComplete(self, player)
-    
-    -- Run custom myQuest code
-end
-```
-
-Take note that both examples define the method using a colon ( : ), which means *self* is implied and is a *QuestLine*.
-However, when calling a global callback, a period ( . ) is used and the questline is passed along with the player.
-
-Events are fired in the following order:
-* *OnAccept()* fires when a player is assigned a previously unknown questline.
-* *OnAssign()* fires each time a player is assigned the questline.
-* *OnProgress()* triggers at each step of progression.
-* *OnCancel()* only happens with a call to *Cancel()*.
-* *OnComplete()* fires when a player has completed the questline.
-
-Be aware that you can only set a callback once per context (global or local).
-Setting it again will overwrite the previous behaviour.
-
---------------------------------------------------------------------------------
 
 ### OnAccept()
 
