@@ -1,4 +1,4 @@
-# Getting Started
+# QuestLine
 
 QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of linear quests.
 
@@ -6,26 +6,68 @@ The module itself does not include data storage or visual elements.
 
 Instead, it offers a framework to create customized quest systems that are event-driven and easily maintained.
 
+---
+
 ## Creating QuestLines
 
-To create a new questline, call *new()*, passing in a *questId*.
-The *questId* is an unique string that identifies the questline within the system.
+QuestLines are created and stored within the system with a call to *new()*.
 
 ```lua
 local myQuest = QuestLine.new("myQuestId")
 ```
 
+The *questId* is a unique string that identifies the questline.
+
+The questline can later be referenced as follows:
+
+```lua
+local myQuest = QuestLine.getQuestById("myQuestId")
+```
+
+---
+
 ## Adding Objectives
 
-Once a questline is created, we can begin adding objectives.  This is done using *AddObjective()*.
+A *QuestLine* consists of one or more objectives in linear order.
+Progression moves from objective to the next until the questline is complete.
 
-The following adds an objective to touch a part named *TouchPart*.
+Adding an objective takes the following form:
+
+```lua
+myQuest:AddObjective(obj:QuestLine.Objective, ...any):number
+```
+
+The *obj* parameter refers to one of the objective types.
+The *...any* parameters are dependant on the type of objective.
+
+There are a total five objective types.  Each have their own set of extra parameters.
+
+* **QuestLine.Event** - a generic, event-based objective.
+  * `event:RBXScriptSignal` - the event to listen for.
+  * `count:number = 1` - number of times the event needs to fire.
+
+* **QuestLine.Score** - a leaderstat objective.
+  * `statName:string` - the name of a leaderstat.
+  * `amount:number` - the amount needed to complete.
+
+* **QuestLine.Timer** - a time-based objective.
+  * `seconds:number` - number of seconds to wait.
+  * `steps:number = 1` - steps of progress counted.
+
+* **QuestLine.Touch** - a touch-based objective.
+  * `touchPart:BasePart` The part to be touched.
+
+* **QuestLine.Value** - an *IntValue* objective.
+  * `intVal:IntValue` The *IntValue* to monitor.
+  * `amount:number` The amount needed to complete.
+
+As an example, the following adds an objective to touch a part named *TouchPart*.
 
 ```lua
 myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 ```
 
-There are a total five objective types.  Check out [objectives](https://farfromlittle.github.io/QuestLine/#objectives) for more.
+---
 
 ## Adding Players
 
@@ -46,6 +88,8 @@ local playerData = {
 }
 ```
 
+---
+
 ## Assigning QuestLines
 
 Once a player is registered, they are ready to be assigned quests.
@@ -56,6 +100,8 @@ myQuest:Assign(player)
 
 This enables the system to fire the appropriate events as the player progresses.
 
+---
+
 ## Handling Progression
 
 Progress is tracked using callbacks related to the various stages.  A typical questline is managed by a global callback.  
@@ -65,7 +111,7 @@ The following defines a global callback that fires for every questline completed
 ```lua
 -- Define a global complete callback
 function QuestLine:OnComplete(player)
-    print(plr.Name, "completed", player)
+    print(player.Name, "completed", self)
 end
 ```
 
@@ -84,8 +130,8 @@ function myQuest:OnComplete(player)
 end
 ```
 
-Take note that both examples define the method using a colon ( : ), which means *self* is implied and is a *QuestLine*.
-However, when calling a global callback, a period ( . ) is used and the questline is passed along with the player.
+> Take note that both examples use a colon `:` when defining the method, which means *self* is implied.
+However, when calling the global callback, a period `.` is used and *self* is passed along with the player.
 
 Events are fired in the following order:
 * *OnAccept()* fires when a player is assigned a previously unknown questline.
@@ -97,11 +143,14 @@ Events are fired in the following order:
 Be aware that you can only set a callback once per context (global or local).
 Setting it again will overwrite the previous behaviour.
 
+---
+
 ## Removing Players
 
 Upon leaving the game, the player needs to be unregistered too.
-This does a bit of cleanup and returns the player's progress to be saved in a datastore.
 
 ```lua
 local playerData = QuestLine.unregisterPlayer(player)
 ```
+
+This does a bit of cleanup and returns the player's progress to be saved into a datastore.
