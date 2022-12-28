@@ -34,10 +34,10 @@ Progression moves from objective to the next until the questline is complete.
 Adding an objective takes the following form:
 
 ```lua
-myQuest:AddObjective(obj:QuestLine.Objective, ...any):number
+myQuest:AddObjective(objType:QuestLine.Objective, ...any):number
 ```
 
-The *obj* parameter refers to one of the objective types.
+The *objType* parameter refers to one of the objective types.
 The *...any* parameters are dependant on the type of objective.
 
 There are a total five objective types.  Each have their own set of extra parameters.
