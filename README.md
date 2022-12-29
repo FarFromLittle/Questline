@@ -28,19 +28,21 @@ local myQuest = QuestLine.getQuestById("myQuestId")
 
 ## Adding Objectives
 
-A *QuestLine* consists of one or more objectives in linear order.
-Progression moves from objective to the next until the questline is complete.
+A *QuestLine* consists of one or more objectives in a linear fashion.
+Progress moves from one objective to the next until the questline is complete.
+
+> Implementing branching, side, or multi-task quests requires the use of multiple questlines and the appropriate callback functions.
 
 Adding an objective takes the following form:
 
 ```lua
-myQuest:AddObjective(objType:QuestLine.Objective, ...any):number
+myQuest:AddObjective(objType, ...any)
 ```
 
 The *objType* parameter refers to one of the objective types.
 The *...any* parameters are dependant on the type of objective.
 
-There are a total five objective types.  Each have their own set of extra parameters.
+There are a total five objective types.  Each having their own set of parameters.
 
 * **QuestLine.Event** - a generic, event-based objective.
   * `event:RBXScriptSignal` - the event to listen for.
@@ -55,16 +57,18 @@ There are a total five objective types.  Each have their own set of extra parame
   * `steps:number = 1` - steps of progress counted.
 
 * **QuestLine.Touch** - a touch-based objective.
-  * `touchPart:BasePart` The part to be touched.
+  * `touchPart:BasePart` - part to be touched.
 
-* **QuestLine.Value** - an *IntValue* objective.
-  * `intVal:IntValue` The *IntValue* to monitor.
-  * `amount:number` The amount needed to complete.
+* **QuestLine.Value** - an objective based on an *IntValue*.
+  * `intVal:IntValue` - *IntValue* to monitor.
+  * `amount:number` - amount needed to complete.
 
-As an example, the following adds an objective to touch a part named *TouchPart*.
+As an example, the following adds an objective to *score* three apples.
+Then, another to return the apples to a drop off point.
 
 ```lua
-myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
+myQuest:AddObjective(QuestLine.Score, "Apples", 3)
+myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
 ```
 
 ---
@@ -72,15 +76,15 @@ myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 ## Adding Players
 
 Players must first register with the system before being assigned a questline.
+This takes an instance of *player* and their progress table loaded from a datastore.
 
 ```lua
 QuestLine.registerPlayer(player, playerData)
 ```
 
-Player progression is stored in a table where progress is stored under the key supplied by *questId*.
-This would normaly be loaded from a datastore.
+Player progression is stored in a table under the key supplied by *questId*.
 
-Additionaly, this table can be populated with starter quests by assigned zero to an entry.
+Additionaly, this table can be pre-populated with starter quests by assigning zero to an entry.
 
 ```lua
 local playerData = {
@@ -104,9 +108,31 @@ This enables the system to fire the appropriate events as the player progresses.
 
 ## Handling Progression
 
-Progress is tracked using callbacks related to the various stages.  A typical questline is managed by a global callback.  
+Events are triggered using callbacks related to the various stages of progression.
 
-The following defines a global callback that fires for every questline completed.
+Events are fired in the following order:
+
+* `OnAccept(player:Player)`
+  * Fires when a player is assigned a previously unknown questline.
+  
+* `OnAssign(player:Player)`
+  * Fires each time a player is assigned the questline.
+  * This includes when a player resumes progress from a previous session.
+  
+* `OnProgress(player:Player, progress:number, objIndex:number)`
+  * Triggers at each step of progression.
+  * The first event fires with `progress = 0`
+  * Lastly with `progress = myQuest:GetObjectiveValue(objIndex)`.
+  
+* `OnComplete(player:Player)`
+  * Fires when a player has completed the questline.
+  
+* `OnCancel(player:Player)`
+  * Only triggered by a call to `myQuest:Cancel(player)`.
+  * Can be used to fail a questline.
+  * A canceled questline can be re-accepted.
+
+A typical questline is managed by a global callback function.  
 
 ```lua
 -- Define a global complete callback
@@ -133,13 +159,6 @@ end
 > Take note that both examples use a colon `:` when defining the method, which means *self* is implied.
 However, when calling the global callback, a period `.` is used and *self* is passed along with the player.
 
-Events are fired in the following order:
-* *OnAccept()* fires when a player is assigned a previously unknown questline.
-* *OnAssign()* fires each time a player is assigned the questline.
-* *OnProgress()* triggers at each step of progression.
-* *OnCancel()* only happens with a call to *Cancel()*.
-* *OnComplete()* fires when a player has completed the questline.
-
 Be aware that you can only set a callback once per context (global or local).
 Setting it again will overwrite the previous behaviour.
 
@@ -153,4 +172,4 @@ Upon leaving the game, the player needs to be unregistered too.
 local playerData = QuestLine.unregisterPlayer(player)
 ```
 
-This does a bit of cleanup and returns the player's progress to be saved into a datastore.
+This does some cleanup and returns the player's progress to be saved in a datastore.
