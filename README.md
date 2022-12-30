@@ -102,7 +102,9 @@ Once a player is registered, they are ready to be assigned quests.
 myQuest:Assign(player)
 ```
 
-This enables the system to fire the appropriate events as the player progresses.
+This will fire the *OnAccept()* callback and add an entry of `myQuestId = 0` to the player's progress table.
+
+When a player is registered, all questlines not found to be complete will automatically be assigned.
 
 ---
 
@@ -173,3 +175,4 @@ local playerData = QuestLine.unregisterPlayer(player)
 ```
 
 This does some cleanup and returns the player's progress to be saved in a datastore.
+
