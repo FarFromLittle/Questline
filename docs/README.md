@@ -1,40 +1,40 @@
 # QuestLine API
 
-[**Objectives**](#objectives)
-* [QuestLine.Event](#questlineevent)
-* [QuestLine.Score](#questlinescore)
-* [QuestLine.Timer](#questlinetimer)
-* [QuestLine.Touch](#questlinetouch)
-* [QuestLine.Value](#questlinevalue)
+[**Enums**](#enums)
+* [Event](#event)
+* [Score](#score)
+* [Timer](#timer)
+* [Touch](#touch)
+* [Value](#value)
 
-[**Class Members**](#class-members)
-* [QuestLine.interval](#questlineinterval)
-* [QuestLine.new()](#questlinenew)
-* [QuestLine.getQuestById()](#questlinegetquestbyid)
-* [QuestLine.register()](#questlineregister)
-* [QuestLine.unregister()](#questlineunregister)
+[**Static Members**](#static-members)
+* [interval](#interval)
+* [new](#new)
+* [getQuestById](#getquestbyid)
+* [register](#register)
+* [unregister](#unregister)
 
 [**Public Methods**](#public-methods)
-* [AddObjective()](#addobjective)
-* [Assign()](#assign)
-* [Cancel()](#cancel)
-* [IsAccepted()](#isaccepted)
-* [IsCanceled()](#iscanceled)
-* [IsComplete()](#iscomplete)
-* [GetCurrentProgress()](#getcurrentprogress)
-* [GetObjectiveValue()](#getobjectivevalue)
-* [GetProgress()](#getprogress)
+* [AddObjective](#addobjective)
+* [Assign](#assign)
+* [Cancel](#cancel)
+* [GetCurrentProgress](#getcurrentprogress)
+* [GetObjectiveValue](#getobjectivevalue)
+* [GetProgress](#getprogress)
+* [IsAccepted](#isaccepted)
+* [IsCanceled](#iscanceled)
+* [IsComplete](#iscomplete)
 
 [**Events**](#events)
-* [OnAccept()](#onaccept)
-* [OnAssign()](#onassign)
-* [OnCancel()](#oncancel)
-* [OnComplete()](#oncomplete)
-* [OnProgress()](#onprogress)
+* [OnAccept](#onaccept)
+* [OnAssign](#onassign)
+* [OnCancel](#oncancel)
+* [OnComplete](#oncomplete)
+* [OnProgress](#onprogress)
 
-## Objectives
+## Enums
 
-### QuestLine.Event
+### Event
 
 `readonly` `string:"event"`
 
@@ -54,7 +54,7 @@ Objective triggered by a roblox signal.
 
 --------------------------------------------------------------------------------
 
-### QuestLine.Score
+### Score
 
 `readonly` `string:"score"`
 
@@ -73,7 +73,7 @@ Objective triggered by a leaderstat value.
 
 --------------------------------------------------------------------------------
 
-### QuestLine.Timer
+### Timer
 
 `readonly` `string:"timer"`
 
@@ -92,7 +92,7 @@ A time based objective.
 
 --------------------------------------------------------------------------------
 
-### QuestLine.Touch
+### Touch
 
 `readonly` `string:"touch"`
 
@@ -110,7 +110,7 @@ Objective based on a touch event.
 
 --------------------------------------------------------------------------------
 
-### QuestLine.Value
+### Value
 
 `readonly` `string:"value"`
 
@@ -129,9 +129,9 @@ Objective based on an IntValue.
 
 --------------------------------------------------------------------------------
 
-## Class Members
+## Static Members
 
-### QuestLine.interval
+### interval
 
 `number` `default=1.0`
 
@@ -139,7 +139,7 @@ Transition time between one objective and the next.  Measured in seconds.
 
 --------------------------------------------------------------------------------
 
-### QuestLine.new()
+### new
 
 `QuestLine.new(questId:string, self:{any}?):QuestLine`
 
@@ -161,7 +161,7 @@ Creates a new questline.
 
 --------------------------------------------------------------------------------
 
-### QuestLine.getQuestById()
+### getQuestById
 
 `QuestLine.getQuestById(questId:string):QuestLine`
 
@@ -182,7 +182,7 @@ Returns a quest created with the given *questId*.
 
 --------------------------------------------------------------------------------
 
-### QuestLine.register()
+### register
 
 `QuestLine.register(player:Player, playerData:{[string]:number})`
 
@@ -205,7 +205,7 @@ Registers a player with the quest system and loads the player's progress.
 
 --------------------------------------------------------------------------------
 
-### QuestLine.unregister()
+### unregister
 
 `QuestLine.unregister(player:Player):{[string]:number}`
 
@@ -228,7 +228,7 @@ Unregisters the player from the quest system and returns the player's progress.
 
 ## Public Methods
 
-### AddObjective()
+### AddObjective
 
 `myQuest:AddObjective(objType:string, ...any):number`
 
@@ -250,7 +250,7 @@ Adds a new objective according to the given objective type.  Additional paramete
 
 --------------------------------------------------------------------------------
 
-### Assign()
+### Assign
 
 `myQuest:Assign(player:Player)`
 
@@ -267,7 +267,7 @@ myQuest:Assign(player)
 
 --------------------------------------------------------------------------------
 
-### Cancel()
+### Cancel
 
 `myQuest:Cancel(player:Player)`
 
@@ -284,7 +284,71 @@ myQuest:Cancel(player)
 
 --------------------------------------------------------------------------------
 
-### IsAccepted()
+### GetCurrentProgress
+
+`myQuest:GetCurrentProgress(player:Player):(number, number)`
+
+Retrieves an objective's progress for a player.
+
+|Parameter|Type    |Default     |Description
+|--------:|:------:|:----------:|:----------
+|*player* |`Player`|*[required]*| The player to query.
+
+|Return  |Description
+|:-------|:----------
+|`number`| The current progress of the *player* within the objective.
+|`number`| The index of the current objective within the *Questline*.
+
+**Example:**
+```lua
+    local currentProgress, index = myQuest:GetCurrentProgress(player)
+```
+
+--------------------------------------------------------------------------------
+
+### GetObjectiveValue
+
+`myQuest:GetObjectiveValue(index:number):number`
+
+Retrieves an objective's total progress needed to pass.
+
+|Parameter|Type    |Default     |Description
+|--------:|:------:|:----------:|:----------
+|*index*  |`number`|*[required]*| The index of the objective within the quest to query.
+
+|Return  |Description
+|:-------|:----------
+|`number`| The objective's maximum progression.
+
+**Example:**
+```lua
+    local value = myQuest:GetObjectiveValue(index)
+```
+
+--------------------------------------------------------------------------------
+
+### GetProgress
+
+`myQuest:GetProgress(player:Player):number`
+
+Retrieves a player's progression for the entire quest, not just the current objective.
+
+|Parameter|Type    |Default     |Description
+|--------:|:------:|:----------:|:----------
+|*player* |`Player`|*[required]*| The player to query.
+
+|Return  |Description
+|:-------|:----------
+|`number`| The *player*'s progress within the questline.
+
+**Example:**
+```lua
+    local progress = myQuest:GetProgress(player)
+```
+
+--------------------------------------------------------------------------------
+
+### IsAccepted
 
 `myQuest:IsAccepted(player:Player):boolean`
 
@@ -307,7 +371,7 @@ end
 
 --------------------------------------------------------------------------------
 
-### IsCanceled()
+### IsCanceled
 
 `myQuest:IsCanceled(player:Player):boolean`
 
@@ -330,7 +394,7 @@ end
 
 --------------------------------------------------------------------------------
 
-### IsComplete()
+### IsComplete
 
 `myQuest:IsComplete(player:Player):boolean`
 
@@ -353,73 +417,9 @@ Checks if the *player* has completed the quest.
 
 --------------------------------------------------------------------------------
 
-### GetCurrentProgress()
-
-`myQuest:GetCurrentProgress(player:Player):(number, number)`
-
-Retrieves an objective's progress for a player.
-
-|Parameter|Type    |Default     |Description
-|--------:|:------:|:----------:|:----------
-|*player* |`Player`|*[required]*| The player to query.
-
-|Return  |Description
-|:-------|:----------
-|`number`| The current progress of the *player* within the objective.
-|`number`| The index of the current objective within the *Questline*.
-
-**Example:**
-```lua
-    local currentProgress, index = myQuest:GetCurrentProgress(player)
-```
-
---------------------------------------------------------------------------------
-
-### GetObjectiveValue()
-
-`myQuest:GetObjectiveValue(index:number):number`
-
-Retrieves an objective's total progress needed to pass.
-
-|Parameter|Type    |Default     |Description
-|--------:|:------:|:----------:|:----------
-|*index*  |`number`|*[required]*| The index of the objective within the quest to query.
-
-|Return  |Description
-|:-------|:----------
-|`number`| The objective's maximum progression.
-
-**Example:**
-```lua
-    local value = myQuest:GetObjectiveValue(index)
-```
-
---------------------------------------------------------------------------------
-
-### GetProgress()
-
-`myQuest:GetProgress(player:Player):number`
-
-Retrieves a player's progression for the entire quest, not just the current objective.
-
-|Parameter|Type    |Default     |Description
-|--------:|:------:|:----------:|:----------
-|*player* |`Player`|*[required]*| The player to query.
-
-|Return  |Description
-|:-------|:----------
-|`number`| The *player*'s progress within the questline.
-
-**Example:**
-```lua
-    local progress = myQuest:GetProgress(player)
-```
-
---------------------------------------------------------------------------------
-
 ## Events
 
-### OnAccept()
+### OnAccept
 
 `myQuest:OnAccept(player:Player)`
 
@@ -438,7 +438,7 @@ Called at the beginning of a quest and only when it's first initialized.  This c
 
 --------------------------------------------------------------------------------
 
-### OnAssign()
+### OnAssign
 
 `myQuest:OnAssign(player:Player)`
 
@@ -457,7 +457,7 @@ Called each time the player is assigned the quest.  This runs after a quest is f
 
 --------------------------------------------------------------------------------
 
-### OnCancel()
+### OnCancel
 
 `myQuest:OnCancel(player:Player)`
 
@@ -476,7 +476,7 @@ Called only when a call to *Cancel* has been made.  This can be used to fail a q
 
 --------------------------------------------------------------------------------
 
-### OnComplete()
+### OnComplete
 
 `myQuest:OnComplete(player:Player)`
 
@@ -495,7 +495,7 @@ Called when a player has completed a quest.
 
 --------------------------------------------------------------------------------
 
-### OnProgress()
+### OnProgress
 
 `myQuest:OnProgress(player:Player, progress:number, index:number)`
 
