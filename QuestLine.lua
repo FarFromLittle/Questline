@@ -1,6 +1,5 @@
 -- Authored by FarFromLittle
 
-export type Objective = "event"|"score"|"timer"|"touch"|"value"
 export type QuestLine = {
 	Event:"event",
 	Score:"score",
@@ -10,17 +9,21 @@ export type QuestLine = {
 	
 	interval:number,
 	
-	new:(questId:string, playerData:{[string]:number})->QuestLine,
 	getQuestById:(questId:string)->QuestLine,
 	register:(player:Player, progressTable:{[string]:number}?)->nil,
 	unregister:(player:Player)->{[string]:number},
 	
-	AddObjective:(self:QuestLine, objType:QuestLine, ...any)->number,
+	new:(questId:string, playerData:{[string]:number})->QuestLine,
+	
+	AddObjective:(self:QuestLine, objType:Objective, ...any)->number,
+	
 	Assign:(self:QuestLine, player:Player)->nil,
 	Cancel:(self:QuestLine, player:Player)->nil,
+	
 	GetCurrentProgress:(self:QuestLine, player:Player)->(number, number),
 	GetObjectiveValue:(self:QuestLine, index:number)->number,
 	GetProgress:(self:QuestLine, player:Player)->number,
+	
 	IsAccepted:(self:QuestLine, player:Player)->boolean,
 	IsCanceled:(self:QuestLine, player:Player)->boolean,
 	IsComplete:(self:QuestLine, player:Player)->boolean,
@@ -32,40 +35,32 @@ export type QuestLine = {
 	OnProgress:(self:QuestLine, player:Player, progress:number, index:number)->nil
 }
 
-local QuestLine = {
-	Event = "event",
-	Score = "score",
-	Timer = "timer",
-	Touch = "touch",
-	Value = "value"
-}
-QuestLine.__index = QuestLine
+export type Objective = "event"|"score"|"timer"|"touch"|"value"
 
 local Objective = {}
 
-function Objective.event(event:RBXScriptSignal, count:number)
-	local function objective(player:Player, progress:number)
-		local plr
-		
+function Objective.event(event:RBXScriptSignal, count:number?)
+	if not count then count = 1 end
+	
+	local function thread(player:Player, progress:number)
 		for i = 1, count - progress do
-			repeat plr = coroutine.yield(progress, event)
-			until plr == player
+			repeat until coroutine.yield(progress, event) == player
 			progress += 1
 		end
 		
 		return progress
 	end
 	
-	return objective, count
+	return thread, count
 end
 
-function Objective.score(name:string, amount:number)
-	local function objective(player:Player, progress:number)
+function Objective.score(statName:string, amount:number)
+	local function thread(player:Player, progress:number)
 		local ldr = player:FindFirstChild("leaderstats")
 		while not(ldr and ldr.Name == "leaderstats") do ldr = coroutine.yield(progress, player.ChildAdded) end
 		
-		local int = ldr:FindFirstChild(name)::IntValue
-		while not(int and int.Name == name) do int = coroutine.yield(progress, ldr.ChildAdded) end
+		local int = ldr:FindFirstChild(statName)::IntValue
+		while not(int and int.Name == statName) do int = coroutine.yield(progress, ldr.ChildAdded) end
 		
 		if amount <= int.Value then return amount end
 		
@@ -76,35 +71,31 @@ function Objective.score(name:string, amount:number)
 		return amount
 	end
 	
-	return objective, amount
+	return thread, amount
 end
 
-function Objective.timer(sec:number, one:boolean?)
-	local function objective(player:Player, progress:number)
+function Objective.timer(seconds:number, steps:number?)
+	local skip = if steps then seconds / math.clamp(steps, 1, seconds) else seconds
+	
+	local function thread(player:Player, progress:number)
 		local event = Instance.new("BindableEvent")
 		
-		while progress < sec do
-			task.delay(1, event.Fire, event, progress)
+		while progress < seconds do
+			task.delay(skip, event.Fire, event, progress + skip)
 			
-			if one then
-				coroutine.yield(0, event.Event)
-			else
-				progress = coroutine.yield(progress, event.Event)
-			end
-			
-			progress += 1
+			progress = coroutine.yield(progress, event.Event)
 		end
 		
 		event:Destroy()
 		
-		return one and 1 or progress
+		return seconds
 	end
 	
-	return objective, one and 1 or sec
+	return thread, seconds
 end
 
 function Objective.touch(touchPart:BasePart)
-	local function objective(player:Player, progress:number)
+	local function thread(player:Player, progress:number)
 		local hit
 		
 		repeat
@@ -114,11 +105,11 @@ function Objective.touch(touchPart:BasePart)
 		return 1
 	end
 	
-	return objective, 1
+	return thread, 1
 end
 
 function Objective.value(intValue:IntValue, amount:number)
-	local function objective(player:Player, progress:number)
+	local function thread(player:Player, progress:number)
 		while progress < amount do
 			progress = coroutine.yield(progress, intValue.Changed)
 		end
@@ -126,16 +117,19 @@ function Objective.value(intValue:IntValue, amount:number)
 		return amount
 	end
 	
-	return objective, amount
+	return thread, amount
 end
 
-QuestLine.interval = 1
-
-function QuestLine:OnAccept(player:Player) end
-function QuestLine:OnAssign(player:Player, progress:number, index:number) end
-function QuestLine:OnCancel(player:Player) end
-function QuestLine:OnComplete(player:Player) end
-function QuestLine:OnProgress(player:Player, progress:number, index:number) end
+local QuestLine = {
+	Event = "event",
+	Score = "score",
+	Timer = "timer",
+	Touch = "touch",
+	Value = "value",
+	
+	interval = 1.0
+}
+QuestLine.__index = QuestLine
 
 local questIndex:{[QuestLine]:string} = {}
 local questTable:{[string]:QuestLine} = {}
@@ -169,17 +163,21 @@ local function disconnect(player:Player, quest:QuestLine)
 	playerObjective[player][quest] = nil
 end
 
+function QuestLine.getQuestById(questId:string):QuestLine
+	return questTable[tostring(questId):sub(1, 50)]
+end
+
 function QuestLine.registerPlayer(player:Player, questData:{[string]:number})
 	playerConnection[player] = {}
 	playerObjective[player] = {}
 	playerProgress[player] = questData
 	
-	for questId in pairs(questData) do
-		local quest = QuestLine.getQuestById(questId)
+	for qid, prg in pairs(questData) do
+		local quest = QuestLine.getQuestById(qid)
 		
 		if not quest then continue end
 		
-		if not quest:IsComplete(player) then quest:Assign(player) end
+		if 0 <= prg and not quest:IsComplete(player) then quest:Assign(player) end
 	end
 end
 
@@ -219,10 +217,6 @@ function QuestLine:__tostring():string
 	return questIndex[self]
 end
 
-function QuestLine.getQuestById(questId:string):QuestLine
-	return questTable[tostring(questId):sub(1, 50)]
-end
-
 function QuestLine:AddObjective(objType:string, ...:any):number
 	local obj, val = Objective[objType](...)
 	
@@ -240,21 +234,26 @@ function QuestLine:Assign(player:Player)
 	
 	assert(playerProgress[player], REGISTER:format(questId, player and player.Name or "Unknown"))
 	assert(0 < objectiveCount[self], EMPTY:format(questId))
-	assert(not self:IsComplete(player), NO_ACCEPT:format(questId, player.Name))
+	assert(not (self:IsComplete(player) or self:IsCanceled(player)), NO_ACCEPT:format(questId, player.Name))
 	
-	local currentProgress, index, progress
+	local index = 1
+	local currentProgress, progress
 	
 	if not self:IsAccepted(player) then
-		index = 1
 		progress = 0
 		currentProgress = 0
 		
-		playerProgress[player][tostring(self)] = 0
+		playerProgress[player][questId] = 0
 		
 		self:OnAccept(player)
 	else
 		progress = self:GetProgress(player)
-		currentProgress, index = self:GetCurrentProgress(player)
+		currentProgress = progress
+		
+		while objectiveValue[self][index] <= currentProgress do
+			currentProgress -= objectiveValue[self][index]
+			index += 1
+		end
 	end
 	
 	self:OnAssign(player)
@@ -324,8 +323,12 @@ function QuestLine:Cancel(player:Player)
 	self:OnCancel(player)
 end
 
-function QuestLine:GetCurrentProgress(player:Player):(number, number)
-	if not self:IsAccepted(player) or self:IsComplete(player) then return 0, 0 end
+function QuestLine:GetCurrentProgress(player:Player):(number?, number?)
+	if not self:IsAccepted(player) then
+		return nil
+	elseif self:IsComplete(player) then
+		return objectiveValue[self][objectiveCount[self]], objectiveCount[self]
+	end
 	
 	local progress = self:GetProgress(player)
 	
@@ -356,7 +359,7 @@ function QuestLine:GetObjectiveValue(index)
 end
 
 function QuestLine:GetProgress(player:Player)
-	return if playerProgress[player] ~= nil then playerProgress[player][questIndex[self]] else 0
+	return playerProgress[player] and playerProgress[player][questIndex[self]]
 end
 
 function QuestLine:IsAccepted(player:Player):boolean
@@ -368,7 +371,18 @@ function QuestLine:IsCanceled(player:Player):boolean
 end
 
 function QuestLine:IsComplete(player)
+	local progress = self:GetProgress(player)
 	return self:IsAccepted(player) and objectiveCount[self] <= playerProgress[player][questIndex[self]]
 end
+
+function QuestLine:OnAccept(player:Player) end
+
+function QuestLine:OnAssign(player:Player) end
+
+function QuestLine:OnCancel(player:Player) end
+
+function QuestLine:OnComplete(player:Player) end
+
+function QuestLine:OnProgress(player:Player, progress:number, index:number) end
 
 return QuestLine
