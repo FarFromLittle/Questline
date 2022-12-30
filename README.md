@@ -84,7 +84,7 @@ QuestLine.registerPlayer(player, playerData)
 
 Player progression is stored in a table under the key supplied by *questId*.
 
-Additionaly, this table can be pre-populated with starter quests by assigning zero to an entry.
+Additionally, this table can be pre-populated with starter quests by assigning zero to an entry.
 
 ```lua
 local playerData = {
@@ -162,7 +162,7 @@ end
 However, when calling the global callback, a period `.` is used and *self* is passed along with the player.
 
 Be aware that you can only set a callback once per context (global or local).
-Setting it again will overwrite the previous behaviour.
+Setting it again will overwrite the previous behavior.
 
 ---
 
