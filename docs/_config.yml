@@ -5,8 +5,10 @@ author:
 description: A Roblox Quest Creation Module
 url: https://farfromlittle.github.io/QuestLine/
 logo: /Q.png
+theme: minima
+minima:
+  skin: dark
 markdown: GFM
-theme: minimal
 titles_from_headings:
   enabled: true
   strip_title: true
