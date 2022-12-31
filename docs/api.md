@@ -60,10 +60,10 @@ Objective triggered by a roblox signal.
 
 Objective triggered by a leaderstat value.
 
-|Parameter|Type    |Default     |Description
-|--------:|:------:|:----------:|:----------
-|   *name*|`string`|*[required]*| The name of the leaderstat to track.
-| *amount*|`number`|*[required]*| Value to consider complete.
+|Parameter |Type    |Default     |Description
+|---------:|:------:|:----------:|:----------
+|*statName*|`string`|*[required]*| The name of the leaderstat to track.
+|*amount*  |`number`|*[required]*| Value to consider complete.
 
 **Example:**
 ```lua
@@ -79,15 +79,15 @@ Objective triggered by a leaderstat value.
 
 A time based objective.
 
-|Parameter|Type     |Default     |Description
-|--------:|:-------:|:----------:|:----------
-|  *count*|`number` |*[required]*| Number of seconds to wait.
-|   *once*|`boolean`|false       | Track each second, or *once* and for all.
+|Parameter|Type    |Default     |Description
+|--------:|:------:|:----------:|:----------
+|*count*  |`number`|*[required]*| Number of seconds to wait.
+|*steps*  |`number`|1           | Steps of progress counted.
 
 **Example:**
 ```lua
-    -- Wait 5 seconds, progressing each step
-    myQuest:AddObjective(QuestLine.Timer, 5, true)
+    -- Wait 5 seconds, counting progress each second
+    myQuest:AddObjective(QuestLine.Timer, 5, 5)
 ```
 
 --------------------------------------------------------------------------------
@@ -136,6 +136,9 @@ Objective based on an IntValue.
 `number` `default=1.0`
 
 Transition time between one objective and the next.  Measured in seconds.
+
+Because an objective fires *OnProgress* for both zero and 100%,
+this provides a chance to update the player's gui before assigned the next objective.
 
 --------------------------------------------------------------------------------
 
