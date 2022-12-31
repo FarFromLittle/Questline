@@ -1,10 +1,12 @@
 title: QuestLine
+author:
+  name: FarFromLittle
+  email: farfromlittle@gmail.com
 description: A Roblox Quest Creation Module
 url: https://farfromlittle.github.io/QuestLine/
+logo: /Q.png
 markdown: GFM
-theme: minima
+theme: minimal
 titles_from_headings:
   enabled: true
   strip_title: true
-minima:
-  skin: auto
