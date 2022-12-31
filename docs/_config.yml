@@ -3,6 +3,6 @@ description: A Roblox Quest Creation Module
 url: https://farfromlittle.github.io/QuestLine/
 markdown: GFM
 theme: minima
-titles-from-headings:
+titles_from_headings:
   enabled: true
-  strip-title: true
+  strip_title: true
