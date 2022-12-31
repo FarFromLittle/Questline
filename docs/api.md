@@ -1,4 +1,4 @@
-# QuestLine API
+# API
 
 [**Enums**](#enums)
 * [Event](#event)
