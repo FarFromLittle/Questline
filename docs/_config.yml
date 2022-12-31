@@ -1,0 +1,8 @@
+name: QuestLine
+description: A Roblox Quest Creation Module
+url: https://farfromlittle.github.io/QuestLine/
+markdown: GFM
+theme: minima
+titles-from-headings:
+  enabled: true
+  strip-title: true
