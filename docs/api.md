@@ -153,9 +153,9 @@ Registers a player with the quest system and loads the player's progress.
 
 > **Example usage:**
 ```lua
--- Load data from datastore
+-- start with new data or load from datastore
 local playerData = {
-    myQuestId = 0 -- Assign to zero for auto-accept
+    myQuestId = 0 -- Assign zero for auto-accept
 }
 
 QuestLine.register(player, playerData)
@@ -175,6 +175,12 @@ Unregisters the player from the quest system and returns the player's progress.
 |:------------------|:----------
 |`{[string]:number}`| The player's progression table.
 
+> **Example usage:**
+```lua
+-- save the returned data to datastore
+local playerData = QuestLine.unregister(player)
+```
+
 Public Methods
 --------------
 
@@ -187,7 +193,7 @@ Adds a new objective according to the given objective type.  Additional paramete
 |Parameter|Type    |Default     |Description
 |--------:|:------:|:----------:|:----------
 |*objType*|`string`|*[required]*| The desired objective type to construct.
-|*...*    |`...any`|*[required]*| See [enum section](#enums) for details.
+|*...*    |`...any`|*[required]*| See [enum](#enums) section for details.
 
 |Return  |Description
 |:-------|:----------
