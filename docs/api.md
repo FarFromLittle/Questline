@@ -1,10 +1,8 @@
-API
-===
-
 Enums
------
+=====
 
-### QuestLine.Event
+QuestLine.Event
+---------------
 
 `readonly` `string:"event"`
 
@@ -21,7 +19,8 @@ local trigger = workspace.Wood.ClickDetector.MouseClicked
 myQuest:AddObjective(QuestLine.Event, trigger, 3)
 ```
 
-### QuestLine.Score
+QuestLine.Score
+---------------
 
 `readonly` `string:"score"`
 
@@ -37,7 +36,8 @@ Objective triggered by a leaderstat value.
 myQuest:AddObjective(QuestLine.Score, "Points", 10)
 ```
 
-### QuestLine.Timer
+QuestLine.Timer
+---------------
 
 `readonly` `string:"timer"`
 
@@ -53,7 +53,8 @@ A time based objective.
 myQuest:AddObjective(QuestLine.Timer, 5, 5)
 ```
 
-### QuestLine.Touch
+QuestLine.Touch
+---------------
 
 `readonly` `string:"touch"`
 
@@ -68,7 +69,8 @@ Objective based on a touch event.
 myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
 ```
 
-### QuestLine.Value
+QuestLine.Value
+---------------
 
 `readonly` `string:"value"`
 
@@ -85,9 +87,10 @@ myQuest:AddObjective(QuestLine.Value, player.EnemiesKilled, 5)
 ```
 
 Static Members
---------------
+==============
 
-### QuestLine.interval
+QuestLine.interval
+------------------
 
 `number` `default=1.0`
 
@@ -96,7 +99,8 @@ Transition time between one objective and the next.  Measured in seconds.
 Because an objective fires *OnProgress* for both zero and 100%,
 this provides a chance to update the player's gui before assigned the next objective.
 
-### QuestLine.new()
+QuestLine.new()
+---------------
 
 `QuestLine.new(questId:string, self:{any}?):QuestLine`
 
@@ -115,7 +119,8 @@ Creates a new questline.
 local myQuest = QuestLine.new("myQuestId", {...})
 ```
 
-### QuestLine.getQuestById()
+QuestLine.getQuestById()
+------------------------
 
 `QuestLine.getQuestById(questId:string):QuestLine`
 
@@ -133,7 +138,8 @@ Returns a quest created with the given *questId*.
 local myQuest = QuestLine.getQuestById("myQuestId")
 ```
 
-### QuestLine.register()
+QuestLine.register()
+--------------------
 
 `QuestLine.register(player:Player, playerData:{[string]:number})`
 
@@ -153,7 +159,8 @@ local playerData = {
 QuestLine.register(player, playerData)
 ```
 
-### QuestLine.unregister()
+QuestLine.unregister()
+----------------------
 
 `QuestLine.unregister(player:Player):{[string]:number}`
 
@@ -173,9 +180,10 @@ local playerData = QuestLine.unregister(player)
 ```
 
 Public Methods
---------------
+==============
 
-### AddObjective()
+AddObjective()
+--------------
 
 `myQuest:AddObjective(objType:string, ...any):number`
 
@@ -194,7 +202,8 @@ Adds a new objective according to the given objective type.  Additional paramete
 local index = myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 ```
 
-### Assign()
+Assign()
+--------
 
 `myQuest:Assign(player:Player)`
 
@@ -208,7 +217,8 @@ Assigns a *player* to a quest.  Triggers *OnAccept* if the quest was previously 
 myQuest:Assign(player)
 ```
 
-### Cancel()
+Cancel()
+--------
 
 `myQuest:Cancel(player:Player)`
 
@@ -222,7 +232,8 @@ Causes the *player* to cancel/fail the current quest.  Triggers the *OnCancel* e
 myQuest:Cancel(player)
 ```
 
-### GetCurrentProgress()
+GetCurrentProgress()
+--------------------
 
 `myQuest:GetCurrentProgress(player:Player):(number, number)`
 
@@ -241,7 +252,8 @@ Retrieves an objective's progress for a player.
 local currentProgress, index = myQuest:GetCurrentProgress(player)
 ```
 
-### GetObjectiveValue()
+GetObjectiveValue()
+-------------------
 
 `myQuest:GetObjectiveValue(index:number):number`
 
@@ -259,7 +271,8 @@ Retrieves an objective's total progress needed to pass.
 local value = myQuest:GetObjectiveValue(index)
 ```
 
-### GetProgress()
+GetProgress()
+-------------
 
 `myQuest:GetProgress(player:Player):number`
 
@@ -277,7 +290,8 @@ Retrieves a player's progression for the entire quest, not just the current obje
 local progress = myQuest:GetProgress(player)
 ```
 
-### IsAccepted()
+IsAccepted()
+------------
 
 `myQuest:IsAccepted(player:Player):boolean`
 
@@ -297,7 +311,8 @@ if myQuest:IsAccepted(player) then
 end
 ```
 
-### IsCanceled()
+IsCanceled()
+------------
 
 `myQuest:IsCanceled(player:Player):boolean`
 
@@ -317,7 +332,8 @@ if myQuest:IsCanceled(player) then
 end
 ```
 
-### IsComplete()
+IsComplete()
+------------
 
 `myQuest:IsComplete(player:Player):boolean`
 
@@ -338,9 +354,10 @@ end
 ```
 
 Events
-------
+======
 
-### QuestLine.OnAccept()
+QuestLine.OnAccept()
+--------------------
 
 `myQuest:OnAccept(player:Player)`
 
@@ -356,7 +373,8 @@ function myQuest:OnAccept(player)
 end
 ```
 
-### QuestLine.OnAssign()
+QuestLine.OnAssign()
+--------------------
 
 `myQuest:OnAssign(player:Player)`
 
@@ -372,7 +390,8 @@ function myQuest:OnAssign(player)
 end
 ```
 
-### QuestLine.OnCancel()
+QuestLine.OnCancel()
+--------------------
 
 `myQuest:OnCancel(player:Player)`
 
@@ -390,7 +409,8 @@ function myQuest:OnCancel(player)
 end
 ```
 
-### QuestLine.OnComplete()
+QuestLine.OnComplete()
+----------------------
 
 `myQuest:OnComplete(player:Player)`
 
@@ -408,7 +428,8 @@ function myQuest:OnComplete(player)
 end
 ```
 
-### QuestLine.OnProgress()
+QuestLine.OnProgress()
+----------------------
 
 `myQuest:OnProgress(player:Player, progress:number, index:number)`
 
