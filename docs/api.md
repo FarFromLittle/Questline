@@ -1,11 +1,17 @@
 
 Enums
-=====
-
-Event
 -----
 
+### Event
+
 `readonly` `string:"event"`
+
+> **Example usage:**
+```lua
+-- Knock on wood
+local trigger = workspace.Wood.ClickDetector.MouseClicked
+myQuest:AddObjective(QuestLine.Event, trigger, 3)
+```
 
 Objective triggered by a roblox signal.
 
@@ -14,18 +20,15 @@ Objective triggered by a roblox signal.
 |  *event*|`RBXScriptSignal`|*[required]*| A roblox signal.
 |  *count*|`number`         |1           | Expected trigger count.
 
-> **Example:**
-
-```lua
-    -- Knock on wood
-    local trigger = workspace.Wood.ClickDetector.MouseClicked
-    myQuest:AddObjective(QuestLine.Event, trigger, 3)
-```
-
-Score
------
+### Score
 
 `readonly` `string:"score"`
+
+> **Example usage:**
+```lua
+    -- Score 10 points on leaderstats
+    myQuest:AddObjective(QuestLine.Score, "Points", 10)
+```
 
 Objective triggered by a leaderstat value.
 
@@ -34,17 +37,15 @@ Objective triggered by a leaderstat value.
 |*statName*|`string`|*[required]*| The name of the leaderstat to track.
 |*amount*  |`number`|*[required]*| Value to consider complete.
 
-> **Example:**
-
-```lua
-    -- Score 10 points on leaderstats
-    myQuest:AddObjective(QuestLine.Score, "Points", 10)
-```
-
-Timer
------
+### Timer
 
 `readonly` `string:"timer"`
+
+> **Example usage:**
+```lua
+    -- Wait 5 seconds, counting progress each second
+    myQuest:AddObjective(QuestLine.Timer, 5, 5)
+```
 
 A time based objective.
 
@@ -53,17 +54,15 @@ A time based objective.
 |*count*  |`number`|*[required]*| Number of seconds to wait.
 |*steps*  |`number`|1           | Steps of progress counted.
 
-> **Example:**
-
-```lua
-    -- Wait 5 seconds, counting progress each second
-    myQuest:AddObjective(QuestLine.Timer, 5, 5)
-```
-
-Touch
------
+### Touch
 
 `readonly` `string:"touch"`
+
+> **Example usage:**
+```lua
+    -- Return to dropoff
+    myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
+```
 
 Objective based on a touch event.
 
@@ -71,17 +70,15 @@ Objective based on a touch event.
 |----------:|:--------:|:----------:|:----------
 |*touchPart*|`BasePart`|*[required]*| A touchable part within the workspace.
 
-> **Example:**
-
-```lua
-    -- Return to dropoff
-    myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
-```
-
-Value
------
+### Value
 
 `readonly` `string:"value"`
+
+> **Example usage:**
+```lua
+    -- Track kills
+    myQuest:AddObjective(QuestLine.Value, player.EnemiesKilled, 5)
+```
 
 Objective based on an IntValue.
 
@@ -90,18 +87,10 @@ Objective based on an IntValue.
 | *intVal*|`IntValue`|*[required]*| A reference to an IntValue.
 |  *count*|`number`  |*[required]*| Value to consider complete.
 
-> **Example:**
-
-```lua
-    -- Track kills
-    myQuest:AddObjective(QuestLine.Value, player.EnemiesKilled, 5)
-```
-
 Static Members
-==============
+--------------
 
-interval
---------
+### interval
 
 `number` `default=1.0`
 
@@ -110,10 +99,14 @@ Transition time between one objective and the next.  Measured in seconds.
 Because an objective fires *OnProgress* for both zero and 100%,
 this provides a chance to update the player's gui before assigned the next objective.
 
-new
----
+### new()
 
 `QuestLine.new(questId:string, self:{any}?):QuestLine`
+
+> **Example usage:**
+```lua
+    local myQuest = QuestLine.new("myQuestId", {...})
+```
 
 Creates a new questline.
 
@@ -126,16 +119,14 @@ Creates a new questline.
 |:----------|:----------
 |*QuestLine*| A new QuestLine.
 
-> **Example:**
-
-```lua
-    local myQuest = QuestLine.new("myQuestId", {...})
-```
-
-getQuestById
-------------
+### getQuestById()
 
 `QuestLine.getQuestById(questId:string):QuestLine`
+
+> **Example usage:**
+```lua
+    local myQuest = QuestLine.getQuestById("myQuestId")
+```
 
 Returns a quest created with the given *questId*.
 
@@ -147,26 +138,11 @@ Returns a quest created with the given *questId*.
 |----------:|:----------
 |`QuestLine`| The quest identified by *questId*.
 
-> **Example:**
-
-```lua
-    local myQuest = QuestLine.getQuestById("myQuestId")
-```
-
-register
---------
+### register()
 
 `QuestLine.register(player:Player, playerData:{[string]:number})`
 
-Registers a player with the quest system and loads the player's progress.
-
-|Parameter   |Type               |Default     |Description
-|-----------:|:-----------------:|:----------:|:----------
-|*player*    |`Player`           |*[required]*| The player to register.
-|*playerData*|`{[string]:number}`|*[required]*| The player's progression table.
-
-> **Example:**
-
+> **Example usage:**
 ```lua
     -- Load data from datastore
     local playerData = {
@@ -176,10 +152,21 @@ Registers a player with the quest system and loads the player's progress.
     QuestLine.register(player, playerData)
 ```
 
-unregister
-----------
+Registers a player with the quest system and loads the player's progress.
+
+|Parameter   |Type               |Default     |Description
+|-----------:|:-----------------:|:----------:|:----------
+|*player*    |`Player`           |*[required]*| The player to register.
+|*playerData*|`{[string]:number}`|*[required]*| The player's progression table.
+
+### unregister()
 
 `QuestLine.unregister(player:Player):{[string]:number}`
+
+> **Example usage:**
+```lua
+    local playerData = QuestLine.unregister(player)
+```
 
 Unregisters the player from the quest system and returns the player's progress.
 
@@ -191,19 +178,17 @@ Unregisters the player from the quest system and returns the player's progress.
 |:------------------|:----------
 |`{[string]:number}`| The player's progression table.
 
-> **Example:**
-
-```lua
-    local playerData = QuestLine.unregister(player)
-```
-
 Public Methods
-==============
+--------------
 
-AddObjective
-------------
+### AddObjective()
 
 `myQuest:AddObjective(objType:string, ...any):number`
+
+> **Example usage:**
+```lua
+    local index = myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
+```
 
 Adds a new objective according to the given objective type.  Additional parameters are determined by the type of objective you wish to add.
 
@@ -216,16 +201,14 @@ Adds a new objective according to the given objective type.  Additional paramete
 |:-------|:----------
 |`number`| The index of the created objective within the *Questline*.
 
-> **Example:**
-
-```lua
-    local index = myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
-```
-
-Assign
-------
+### Assign()
 
 `myQuest:Assign(player:Player)`
+
+> **Example usage:**
+```lua
+myQuest:Assign(player)
+```
 
 Assigns a *player* to a quest.  Triggers *OnAccept* if the quest was previously unknown followed by *OnAssign*.  A call to *OnProgress* is also included as a final step.
 
@@ -233,16 +216,14 @@ Assigns a *player* to a quest.  Triggers *OnAccept* if the quest was previously 
 |--------:|:------:|:----------:|:----------
 |*player* |`Player`|*[required]*| The player to assign.
 
-> **Example:**
-
-```lua
-myQuest:Assign(player)
-```
-
-Cancel
-------
+### Cancel()
 
 `myQuest:Cancel(player:Player)`
+
+> **Example usage:**
+```lua
+myQuest:Cancel(player)
+```
 
 Causes the *player* to cancel/fail the current quest.  Triggers the *OnCancel* event listener.  A quest can be re-assigned after being canceled, triggering the *OnAccept* event listener once more.
 
@@ -250,16 +231,14 @@ Causes the *player* to cancel/fail the current quest.  Triggers the *OnCancel* e
 |--------:|:------:|:----------:|:----------
 |*player* |`Player`|*[required]*| The player to cancel the quest on.
 
-> **Example:**
-
-```lua
-myQuest:Cancel(player)
-```
-
-GetCurrentProgress
-------------------
+### GetCurrentProgress()
 
 `myQuest:GetCurrentProgress(player:Player):(number, number)`
+
+> **Example usage:**
+```lua
+    local currentProgress, index = myQuest:GetCurrentProgress(player)
+```
 
 Retrieves an objective's progress for a player.
 
@@ -272,16 +251,14 @@ Retrieves an objective's progress for a player.
 |`number`| The current progress of the *player* within the objective.
 |`number`| The index of the current objective within the *Questline*.
 
-> **Example:**
-
-```lua
-    local currentProgress, index = myQuest:GetCurrentProgress(player)
-```
-
-GetObjectiveValue
------------------
+### GetObjectiveValue()
 
 `myQuest:GetObjectiveValue(index:number):number`
+
+> **Example usage:**
+```lua
+    local value = myQuest:GetObjectiveValue(index)
+```
 
 Retrieves an objective's total progress needed to pass.
 
@@ -293,16 +270,14 @@ Retrieves an objective's total progress needed to pass.
 |:-------|:----------
 |`number`| The objective's maximum progression.
 
-> **Example:**
-
-```lua
-    local value = myQuest:GetObjectiveValue(index)
-```
-
-GetProgress
------------
+### GetProgress()
 
 `myQuest:GetProgress(player:Player):number`
+
+> **Example usage:**
+```lua
+    local progress = myQuest:GetProgress(player)
+```
 
 Retrieves a player's progression for the entire quest, not just the current objective.
 
@@ -314,16 +289,16 @@ Retrieves a player's progression for the entire quest, not just the current obje
 |:-------|:----------
 |`number`| The *player*'s progress within the questline.
 
-> **Example:**
-
-```lua
-    local progress = myQuest:GetProgress(player)
-```
-
-IsAccepted
-----------
+### IsAccepted()
 
 `myQuest:IsAccepted(player:Player):boolean`
+
+> **Example usage:**
+```lua
+if myQuest:IsAccepted(player) then
+    -- This is no surprise
+end
+```
 
 Checks if the quest is accepted by the *player*.  A quest is only accepted when assigned for the first time, or after it has been canceled.
 
@@ -335,18 +310,16 @@ Checks if the quest is accepted by the *player*.  A quest is only accepted when 
 |:--------|:----------
 |`boolean`| Determines if the quest is accepted.
 
-> **Example:**
-
-```lua
-if myQuest:IsAccepted(player) then
-    -- This is no surprise
-end
-```
-
-IsCanceled
-----------
+### IsCanceled()
 
 `myQuest:IsCanceled(player:Player):boolean`
+
+> **Example usage:**
+```lua
+if myQuest:IsCanceled(player) then
+    -- Where did I go wrong?
+end
+```
 
 Checks if the quest is canceled for the *player*.
 
@@ -358,18 +331,16 @@ Checks if the quest is canceled for the *player*.
 |:--------|:----------
 |`boolean`| Determines if the quest is canceled.
 
-> **Example:**
-
-```lua
-if myQuest:IsCanceled(player) then
-    -- Where did I go wrong?
-end
-```
-
-IsComplete
-----------
+### IsComplete()
 
 `myQuest:IsComplete(player:Player):boolean`
+
+> **Example usage:**
+```lua
+    if myQuest:IsCompete(player) then
+        -- Yeah, I did that!
+    end
+```
 
 Checks if the *player* has completed the quest.
 
@@ -381,21 +352,19 @@ Checks if the *player* has completed the quest.
 |:--------|:----------
 |`boolean`| Determines if the quest is complete.
 
-> **Example:**
-
-```lua
-    if myQuest:IsCompete(player) then
-        -- Yeah, I did that!
-    end
-```
-
 Events
-======
+------
 
-OnAccept
---------
+### OnAccept()
 
 `myQuest:OnAccept(player:Player)`
+
+> **Example usage:**
+```lua
+    function myQuest:OnAccept(player)
+        -- Run code upon initialization
+    end
+```
 
 Called at the beginning of a quest and only when it's first initialized.  This can be used to give a player starter items specific to the quest.
 
@@ -403,18 +372,16 @@ Called at the beginning of a quest and only when it's first initialized.  This c
 |---------:|:------:|:----------
 |*player*  |`Player`| A reference to the player.
 
-> **Example:**
-
-```lua
-    function myQuest:OnAccept(player)
-        -- Run code upon initialization
-    end
-```
-
-OnAssign
---------
+### OnAssign()
 
 `myQuest:OnAssign(player:Player)`
+
+> **Example usage:**
+```lua
+    function myQuest:OnAssign(player)
+        -- Run code upon assignment
+    end
+```
 
 Called each time the player is assigned the quest.  This runs after a quest is first accepted, or when a player loads progress from a previous session.  Useful for creating gui elements needed to display a quest log.
 
@@ -422,18 +389,16 @@ Called each time the player is assigned the quest.  This runs after a quest is f
 |---------:|:------:|:----------
 |*player*  |`Player`| A reference to the player.
 
-> **Example:**
-
-```lua
-    function myQuest:OnAssign(player)
-        -- Run code upon assignment
-    end
-```
-
-OnCancel
---------
+### OnCancel()
 
 `myQuest:OnCancel(player:Player)`
+
+**Example usage:**
+```lua
+    function myQuest:OnCancel(player)
+        -- Run code upon cancelation
+    end
+```
 
 Called only when a call to *Cancel* has been made.  This can be used to fail a quest.
 
@@ -441,17 +406,16 @@ Called only when a call to *Cancel* has been made.  This can be used to fail a q
 |---------:|:------:|:----------
 |*player*  |`Player`| A reference to the player.
 
-**Example:**
-```lua
-    function myQuest:OnCancel(player)
-        -- Run code upon cancelation
-    end
-```
-
-OnComplete
-----------
+### OnComplete()
 
 `myQuest:OnComplete(player:Player)`
+
+**Example usage:**
+```lua
+    function myQuest:OnComplete(player)
+        -- Run code upon completion
+    end
+```
 
 Called when a player has completed a quest.
 
@@ -459,17 +423,16 @@ Called when a player has completed a quest.
 |---------:|:------:|:----------
 |*player*  |`Player`| A reference to the player.
 
-**Example:**
-```lua
-    function myQuest:OnComplete(player)
-        -- Run code upon completion
-    end
-```
-
-OnProgress
-----------
+### OnProgress()
 
 `myQuest:OnProgress(player:Player, progress:number, index:number)`
+
+> **Example usage:**
+```lua
+    function myQuest:OnProgress(player, progress, index)
+        print(player.Name, "has progressed to", progress, "for objective", index)
+    end
+```
 
 Called when a player has made progress.  For the first time, progress will be zero, and lastly, the progress will be equal to `myQuest:GetObjectiveValue(index)`.
 
@@ -478,11 +441,3 @@ Called when a player has made progress.  For the first time, progress will be ze
 |*player*  |`Player`| A reference to the player.
 |*progress*|`number`| The objective's progress for the player.
 |*index*   |`number`| The objective's index within the quest.
-
-> **Example:**
-
-```lua
-    function myQuest:OnProgress(player, progress, index)
-        print(player.Name, "has progressed to", progress, "for objective", index)
-    end
-```
