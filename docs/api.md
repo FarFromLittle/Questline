@@ -184,7 +184,7 @@ Adds a new objective according to the given objective type.  Additional paramete
 |Parameter|Type    |Default     |Description
 |--------:|:------:|:----------:|:----------
 |*objType*|`string`|*[required]*| The desired objective type to construct.
-|*...*    |`...any`|*[required]*| See [enum](#enums) section for details.
+|*...*    |`...any`|*[required]*| See [enum](#ENUMS) section for details.
 
 |Return  |Description
 |:-------|:----------
