@@ -1,4 +1,14 @@
-## Getting Started
+QuestLine
+=========
+
+QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of linear quests.
+
+The module itself does not include data storage or visual elements.
+
+Instead, it offers a framework to create customized quest systems that are event-driven and easily maintained.
+
+Getting Started
+---------------
 
 QuestLines are created and stored within the system with a call to *new()*.
 
@@ -14,9 +24,8 @@ The questline can later be referenced as follows:
 local myQuest = QuestLine.getQuestById("myQuestId")
 ```
 
----
-
-## Adding Objectives
+Adding Objectives
+-----------------
 
 A *QuestLine* consists of one or more objectives in a linear fashion.
 Progress moves from one objective to the next until the questline is complete.
@@ -61,9 +70,8 @@ myQuest:AddObjective(QuestLine.Score, "Apples", 3)
 myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
 ```
 
----
-
-## Adding Players
+Adding Players
+--------------
 
 Players must first register with the system before being assigned a questline.
 This takes an instance of *player* and their progress table loaded from a datastore.
@@ -82,9 +90,8 @@ local playerData = {
 }
 ```
 
----
-
-## Assigning QuestLines
+Assigning QuestLines
+--------------------
 
 Once a player is registered, they are ready to be assigned quests.
 
@@ -96,9 +103,8 @@ This will fire the *OnAccept()* callback and add an entry of `myQuestId = 0` to 
 
 When a player is registered, all questlines not found to be complete will automatically be assigned.
 
----
-
-## Handling Progression
+Handling Progression
+--------------------
 
 Events are triggered using callbacks related to the various stages of progression.
 
@@ -154,9 +160,8 @@ However, when calling the global callback, a period `.` is used and *self* is pa
 Be aware that you can only set a callback once per context (global or local).
 Setting it again will overwrite the previous behavior.
 
----
-
-## Removing Players
+Removing Players
+----------------
 
 Upon leaving the game, the player needs to be unregistered too.
 
