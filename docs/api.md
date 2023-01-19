@@ -152,10 +152,11 @@ Registers a player with the quest system and loads the player's progress.
 |*playerData*|`{[string]:number}`|*[required]*| The player's progression table.
 
 > **Example usage:**
+
 ```lua
 -- start with new data or load from datastore
 local playerData = {
-    myQuestId = 0 -- Assign zero for auto-accept
+    myQuestId = 0 -- Assign zero to auto-accept
 }
 
 QuestLine.register(player, playerData)
@@ -176,6 +177,7 @@ Unregisters the player from the quest system and returns the player's progress.
 |`{[string]:number}`| The player's progression table.
 
 > **Example usage:**
+
 ```lua
 -- save the returned data to datastore
 local playerData = QuestLine.unregister(player)
@@ -200,6 +202,7 @@ Adds a new objective according to the given objective type.  Additional paramete
 |`number`| The index of the created objective within the *Questline*.
 
 > **Example usage:**
+
 ```lua
 local index = myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 ```
@@ -215,6 +218,7 @@ Assigns a *player* to a quest.  Triggers *OnAccept* if the quest was previously 
 |*player* |`Player`|*[required]*| The player to assign.
 
 > **Example usage:**
+
 ```lua
 myQuest:Assign(player)
 ```
@@ -230,6 +234,7 @@ Causes the *player* to cancel/fail the current quest.  Triggers the *OnCancel* e
 |*player* |`Player`|*[required]*| The player to cancel the quest on.
 
 > **Example usage:**
+
 ```lua
 myQuest:Cancel(player)
 ```
@@ -250,6 +255,7 @@ Retrieves an objective's progress for a player.
 |`number`| The index of the current objective within the *Questline*.
 
 > **Example usage:**
+
 ```lua
 local currentProgress, index = myQuest:GetCurrentProgress(player)
 ```
@@ -269,6 +275,7 @@ Retrieves an objective's total progress needed to pass.
 |`number`| The objective's maximum progression.
 
 > **Example usage:**
+
 ```lua
 local value = myQuest:GetObjectiveValue(index)
 ```
@@ -288,6 +295,7 @@ Retrieves a player's progression for the entire quest, not just the current obje
 |`number`| The *player*'s progress within the questline.
 
 > **Example usage:**
+
 ```lua
 local progress = myQuest:GetProgress(player)
 ```
@@ -307,6 +315,7 @@ Checks if the quest is accepted by the *player*.  A quest is only accepted when 
 |`boolean`| Determines if the quest is accepted.
 
 > **Example usage:**
+
 ```lua
 if myQuest:IsAccepted(player) then
     -- This is no surprise
@@ -328,6 +337,7 @@ Checks if the quest is canceled for the *player*.
 |`boolean`| Determines if the quest is canceled.
 
 > **Example usage:**
+
 ```lua
 if myQuest:IsCanceled(player) then
     -- Where did I go wrong?
@@ -349,6 +359,7 @@ Checks if the *player* has completed the quest.
 |`boolean`| Determines if the quest is complete.
 
 > **Example usage:**
+
 ```lua
 if myQuest:IsCompete(player) then
     -- Yeah, I did that!
@@ -369,6 +380,7 @@ Called at the beginning of a quest and only when it's first initialized.  This c
 |*player*  |`Player`| A reference to the player.
 
 > **Example usage:**
+
 ```lua
 function myQuest:OnAccept(player)
     -- Run code upon initialization
@@ -386,6 +398,7 @@ Called each time the player is assigned the quest.  This runs after a quest is f
 |*player*  |`Player`| A reference to the player.
 
 > **Example usage:**
+
 ```lua
 function myQuest:OnAssign(player)
     -- Run code upon assignment
@@ -403,6 +416,7 @@ Called only when a call to *Cancel* has been made.  This can be used to fail a q
 |*player*  |`Player`| A reference to the player.
 
 **Example usage:**
+
 ```lua
 function myQuest:OnCancel(player)
     -- Run code upon cancelation
@@ -420,6 +434,7 @@ Called when a player has completed a quest.
 |*player*  |`Player`| A reference to the player.
 
 **Example usage:**
+
 ```lua
 function myQuest:OnComplete(player)
     -- Run code upon completion
@@ -439,6 +454,7 @@ Called when a player has made progress.  For the first time, progress will be ze
 |*index*   |`number`| The objective's index within the quest.
 
 > **Example usage:**
+
 ```lua
 function myQuest:OnProgress(player, progress, index)
     print(player.Name, "has progressed to", progress, "for objective", index)
