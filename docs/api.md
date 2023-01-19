@@ -1,5 +1,5 @@
-QuestLine API
-=================
+API
+===
 
 Enums
 -----
@@ -184,7 +184,7 @@ Adds a new objective according to the given objective type.  Additional paramete
 |Parameter|Type    |Default     |Description
 |--------:|:------:|:----------:|:----------
 |*objType*|`string`|*[required]*| The desired objective type to construct.
-|*...*    |`...any`|*[required]*| See [enum](#ENUMS) section for details.
+|*...*    |`...any`|*[required]*| See [enum](#api-enums) section for details.
 
 |Return  |Description
 |:-------|:----------
