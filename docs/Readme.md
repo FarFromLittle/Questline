@@ -10,60 +10,65 @@ Instead, it offers a framework to create customized quest systems that are event
 Getting Started
 ---------------
 
-QuestLines are created and stored within the system with a call to *new()*.
+QuestLines are created with a call to *new*; only requiring a *questId*.
 
 ```lua
 local myQuest = QuestLine.new("myQuestId")
 ```
 
-The *questId* is a unique string that identifies the questline.
+The *questId* is a unique string used to store the questline within the system.
 
-The questline can later be referenced as follows:
+> The questline can later be referenced as follows:
 
 ```lua
 local myQuest = QuestLine.getQuestById("myQuestId")
 ```
 
 Adding Objectives
------------------
+=================
 
-A *QuestLine* consists of one or more objectives in a linear fashion.
-Progress moves from one objective to the next until the questline is complete.
+A *QuestLine* consists of one or more objectives in a sequence.  Progress moves from one objective to the next until the questline is complete.
 
-> Implementing branching, side, or multi-task quests requires the use of multiple questlines and the appropriate callback functions.
+The first parameter refers to one of the objective types.  The rest of the parameters are dependant on the type of objective added.
 
-Adding an objective takes the following form:
+> Adding an objective takes the following form:
 
 ```lua
 myQuest:AddObjective(objType, ...any)
 ```
 
-The *objType* parameter refers to one of the objective types.
-The *...any* parameters are dependant on the type of objective.
+Objectives
+----------
 
 There are a total five objective types.  Each having their own set of parameters.
 
-* **QuestLine.Event** - a generic, event-based objective.
-  * `event:RBXScriptSignal` - the event to listen for.
-  * `count:number = 1` - number of times the event needs to fire.
+### Event
 
-* **QuestLine.Score** - a leaderstat objective.
-  * `statName:string` - the name of a leaderstat.
-  * `amount:number` - the amount needed to complete.
+A generic, event-based objective.
 
-* **QuestLine.Timer** - a time-based objective.
-  * `seconds:number` - number of seconds to wait.
-  * `steps:number = 1` - steps of progress counted.
+This objective connects to a Roblox signal and waits for it to be fired a number of times.
 
-* **QuestLine.Touch** - a touch-based objective.
-  * `touchPart:BasePart` - part to be touched.
+### Score
 
-* **QuestLine.Value** - an objective based on an *IntValue*.
-  * `intVal:IntValue` - *IntValue* to monitor.
-  * `amount:number` - amount needed to complete.
+An objective based on the value of a leaderstat.
 
-As an example, the following adds an objective to *score* three apples.
-Then, another to return the apples to a drop off point.
+By default, this objective monitors a leaderstat until it is ```>=``` the given value.  This behavior can be changed using the optional *operation* parameter.
+
+### Timer
+
+A time-based objective.
+
+This introduces a delay before moving on to the next objective.
+
+### Touch
+
+A touch-based objective.
+
+This objective requires the assigned player to come in contact with a part.
+
+### Value
+
+An objective based on the value of a given *IntValue*.
 
 ```lua
 myQuest:AddObjective(QuestLine.Score, "Apples", 3)
