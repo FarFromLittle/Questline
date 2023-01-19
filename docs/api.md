@@ -35,8 +35,8 @@ Objective triggered by a leaderstat value.
 
 > **Example usage:**
 ```lua
-    -- Score 10 points on leaderstats
-    myQuest:AddObjective(QuestLine.Score, "Points", 10)
+-- Score 10 points on leaderstats
+myQuest:AddObjective(QuestLine.Score, "Points", 10)
 ```
 
 ### QuestLine.Timer
@@ -52,8 +52,8 @@ A time based objective.
 
 > **Example usage:**
 ```lua
-    -- Wait 5 seconds, counting progress each second
-    myQuest:AddObjective(QuestLine.Timer, 5, 5)
+-- Wait 5 seconds, counting progress each second
+myQuest:AddObjective(QuestLine.Timer, 5, 5)
 ```
 
 ### QuestLine.Touch
@@ -68,8 +68,8 @@ Objective based on a touch event.
 
 > **Example usage:**
 ```lua
-    -- Return to dropoff
-    myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
+-- Return to dropoff
+myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
 ```
 
 ### QuestLine.Value
@@ -85,8 +85,8 @@ Objective based on an IntValue.
 
 > **Example usage:**
 ```lua
-    -- Track kills
-    myQuest:AddObjective(QuestLine.Value, player.EnemiesKilled, 5)
+-- Track kills
+myQuest:AddObjective(QuestLine.Value, player.EnemiesKilled, 5)
 ```
 
 Static Members
@@ -118,7 +118,7 @@ Creates a new questline.
 
 > **Example usage:**
 ```lua
-    local myQuest = QuestLine.new("myQuestId", {...})
+local myQuest = QuestLine.new("myQuestId", {...})
 ```
 
 ### QuestLine.getQuestById()
@@ -137,7 +137,7 @@ Returns a quest created with the given *questId*.
 
 > **Example usage:**
 ```lua
-    local myQuest = QuestLine.getQuestById("myQuestId")
+local myQuest = QuestLine.getQuestById("myQuestId")
 ```
 
 ### QuestLine.register()
@@ -153,12 +153,12 @@ Registers a player with the quest system and loads the player's progress.
 
 > **Example usage:**
 ```lua
-    -- Load data from datastore
-    local playerData = {
-        myQuestId = 0 -- Assign to zero for auto-accept
-    }
-    
-    QuestLine.register(player, playerData)
+-- Load data from datastore
+local playerData = {
+    myQuestId = 0 -- Assign to zero for auto-accept
+}
+
+QuestLine.register(player, playerData)
 ```
 
 ### QuestLine.unregister()
@@ -177,7 +177,7 @@ Unregisters the player from the quest system and returns the player's progress.
 
 > **Example usage:**
 ```lua
-    local playerData = QuestLine.unregister(player)
+local playerData = QuestLine.unregister(player)
 ```
 
 Public Methods
@@ -200,7 +200,7 @@ Adds a new objective according to the given objective type.  Additional paramete
 
 > **Example usage:**
 ```lua
-    local index = myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
+local index = myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 ```
 
 ### Assign()
@@ -250,7 +250,7 @@ Retrieves an objective's progress for a player.
 
 > **Example usage:**
 ```lua
-    local currentProgress, index = myQuest:GetCurrentProgress(player)
+local currentProgress, index = myQuest:GetCurrentProgress(player)
 ```
 
 ### GetObjectiveValue()
@@ -269,7 +269,7 @@ Retrieves an objective's total progress needed to pass.
 
 > **Example usage:**
 ```lua
-    local value = myQuest:GetObjectiveValue(index)
+local value = myQuest:GetObjectiveValue(index)
 ```
 
 ### GetProgress()
@@ -288,7 +288,7 @@ Retrieves a player's progression for the entire quest, not just the current obje
 
 > **Example usage:**
 ```lua
-    local progress = myQuest:GetProgress(player)
+local progress = myQuest:GetProgress(player)
 ```
 
 ### IsAccepted()
@@ -349,9 +349,9 @@ Checks if the *player* has completed the quest.
 
 > **Example usage:**
 ```lua
-    if myQuest:IsCompete(player) then
-        -- Yeah, I did that!
-    end
+if myQuest:IsCompete(player) then
+    -- Yeah, I did that!
+end
 ```
 
 Events
@@ -369,9 +369,9 @@ Called at the beginning of a quest and only when it's first initialized.  This c
 
 > **Example usage:**
 ```lua
-    function myQuest:OnAccept(player)
-        -- Run code upon initialization
-    end
+function myQuest:OnAccept(player)
+    -- Run code upon initialization
+end
 ```
 
 ### QuestLine.OnAssign()
@@ -386,9 +386,9 @@ Called each time the player is assigned the quest.  This runs after a quest is f
 
 > **Example usage:**
 ```lua
-    function myQuest:OnAssign(player)
-        -- Run code upon assignment
-    end
+function myQuest:OnAssign(player)
+    -- Run code upon assignment
+end
 ```
 
 ### QuestLine.OnCancel()
@@ -403,9 +403,9 @@ Called only when a call to *Cancel* has been made.  This can be used to fail a q
 
 **Example usage:**
 ```lua
-    function myQuest:OnCancel(player)
-        -- Run code upon cancelation
-    end
+function myQuest:OnCancel(player)
+    -- Run code upon cancelation
+end
 ```
 
 ### QuestLine.OnComplete()
@@ -420,9 +420,9 @@ Called when a player has completed a quest.
 
 **Example usage:**
 ```lua
-    function myQuest:OnComplete(player)
-        -- Run code upon completion
-    end
+function myQuest:OnComplete(player)
+    -- Run code upon completion
+end
 ```
 
 ### QuestLine.OnProgress()
@@ -439,7 +439,7 @@ Called when a player has made progress.  For the first time, progress will be ze
 
 > **Example usage:**
 ```lua
-    function myQuest:OnProgress(player, progress, index)
-        print(player.Name, "has progressed to", progress, "for objective", index)
-    end
+function myQuest:OnProgress(player, progress, index)
+    print(player.Name, "has progressed to", progress, "for objective", index)
+end
 ```
