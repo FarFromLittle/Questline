@@ -1,8 +1,10 @@
+QuestLine API
+=================
 
 Enums
 -----
 
-### Event
+### QuestLine.Event
 
 `readonly` `string:"event"`
 
@@ -20,7 +22,7 @@ local trigger = workspace.Wood.ClickDetector.MouseClicked
 myQuest:AddObjective(QuestLine.Event, trigger, 3)
 ```
 
-### Score
+### QuestLine.Score
 
 `readonly` `string:"score"`
 
@@ -37,7 +39,7 @@ Objective triggered by a leaderstat value.
     myQuest:AddObjective(QuestLine.Score, "Points", 10)
 ```
 
-### Timer
+### QuestLine.Timer
 
 `readonly` `string:"timer"`
 
@@ -54,7 +56,7 @@ A time based objective.
     myQuest:AddObjective(QuestLine.Timer, 5, 5)
 ```
 
-### Touch
+### QuestLine.Touch
 
 `readonly` `string:"touch"`
 
@@ -70,7 +72,7 @@ Objective based on a touch event.
     myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
 ```
 
-### Value
+### QuestLine.Value
 
 `readonly` `string:"value"`
 
@@ -90,7 +92,7 @@ Objective based on an IntValue.
 Static Members
 --------------
 
-### interval
+### QuestLine.interval
 
 `number` `default=1.0`
 
@@ -99,7 +101,7 @@ Transition time between one objective and the next.  Measured in seconds.
 Because an objective fires *OnProgress* for both zero and 100%,
 this provides a chance to update the player's gui before assigned the next objective.
 
-### new()
+### QuestLine.new()
 
 `QuestLine.new(questId:string, self:{any}?):QuestLine`
 
@@ -119,7 +121,7 @@ Creates a new questline.
     local myQuest = QuestLine.new("myQuestId", {...})
 ```
 
-### getQuestById()
+### QuestLine.getQuestById()
 
 `QuestLine.getQuestById(questId:string):QuestLine`
 
@@ -138,7 +140,7 @@ Returns a quest created with the given *questId*.
     local myQuest = QuestLine.getQuestById("myQuestId")
 ```
 
-### register()
+### QuestLine.register()
 
 `QuestLine.register(player:Player, playerData:{[string]:number})`
 
@@ -159,7 +161,7 @@ Registers a player with the quest system and loads the player's progress.
     QuestLine.register(player, playerData)
 ```
 
-### unregister()
+### QuestLine.unregister()
 
 `QuestLine.unregister(player:Player):{[string]:number}`
 
@@ -355,7 +357,7 @@ Checks if the *player* has completed the quest.
 Events
 ------
 
-### OnAccept()
+### QuestLine.OnAccept()
 
 `myQuest:OnAccept(player:Player)`
 
@@ -372,7 +374,7 @@ Called at the beginning of a quest and only when it's first initialized.  This c
     end
 ```
 
-### OnAssign()
+### QuestLine.OnAssign()
 
 `myQuest:OnAssign(player:Player)`
 
@@ -389,7 +391,7 @@ Called each time the player is assigned the quest.  This runs after a quest is f
     end
 ```
 
-### OnCancel()
+### QuestLine.OnCancel()
 
 `myQuest:OnCancel(player:Player)`
 
@@ -406,7 +408,7 @@ Called only when a call to *Cancel* has been made.  This can be used to fail a q
     end
 ```
 
-### OnComplete()
+### QuestLine.OnComplete()
 
 `myQuest:OnComplete(player:Player)`
 
@@ -423,7 +425,7 @@ Called when a player has completed a quest.
     end
 ```
 
-### OnProgress()
+### QuestLine.OnProgress()
 
 `myQuest:OnProgress(player:Player, progress:number, index:number)`
 
