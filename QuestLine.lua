@@ -1,8 +1,11 @@
 -- Authored by FarFromLittle
 
+export type Objective = "event"|"score"|"speak"|"timer"|"touch"|"value"
+
 export type QuestLine = {
 	Event:"event",
 	Score:"score",
+	Speak:"speak",
 	Timer:"timer",
 	Touch:"touch",
 	Value:"value",
@@ -13,7 +16,7 @@ export type QuestLine = {
 	register:(player:Player, progressTable:{[string]:number}?)->nil,
 	unregister:(player:Player)->{[string]:number},
 	
-	new:(questId:string, playerData:{[string]:number})->QuestLine,
+	new:(questId:string, self:{}?)->QuestLine,
 	
 	AddObjective:(self:QuestLine, objType:Objective, ...any)->number,
 	
@@ -35,49 +38,72 @@ export type QuestLine = {
 	OnProgress:(self:QuestLine, player:Player, progress:number, index:number)->nil
 }
 
-export type Objective = "event"|"score"|"timer"|"touch"|"value"
+local QuestLine = {
+	Event = "event",
+	Score = "score",
+	Timer = "timer",
+	Touch = "touch",
+	Value = "value",
+	
+	interval = 1.0
+}
+QuestLine.__index = QuestLine
 
 local Objective = {}
 
-function Objective.event(event:RBXScriptSignal, count:number?)
+local function comp(plr, arg) return plr == arg end
+
+local ops = {
+	[">"] = function (a, b) return a > b end;
+	["<"] = function (a, b) return a < b end;
+	[">="] = function (a, b) return a >= b end;
+	["<="] = function (a, b) return a <= b end;
+	["=="] = function (a, b) return a == b end;
+	["~="] = function (a, b) return a ~= b end;
+}
+
+function Objective.event(event:RBXScriptSignal, count:number?, compare:(plr:Player, ...any)->(boolean)?)
 	if not count then count = 1 end
+	if not compare then compare = comp end
 	
-	local function thread(player:Player, progress:number)
+	local function eval(player:Player, progress:number)
 		for i = 1, count - progress do
-			repeat until coroutine.yield(progress, event) == player
+			repeat until comp(player, coroutine.yield(progress, event))
 			progress += 1
 		end
 		
 		return progress
 	end
 	
-	return thread, count
+	return eval, count
 end
 
-function Objective.score(statName:string, amount:number)
-	local function thread(player:Player, progress:number)
+function Objective.score(statName:string, amount:number, operator:string?)
+	local op = operator and ops[operator] or ops[">="]
+	
+	local function eval(player:Player, progress:number)
 		local ldr = player:FindFirstChild("leaderstats")
 		while not(ldr and ldr.Name == "leaderstats") do ldr = coroutine.yield(progress, player.ChildAdded) end
 		
 		local int = ldr:FindFirstChild(statName)::IntValue
 		while not(int and int.Name == statName) do int = coroutine.yield(progress, ldr.ChildAdded) end
 		
-		if amount <= int.Value then return amount end
-		
 		progress = int.Value
 		
-		while progress < amount do progress = coroutine.yield(progress, int.Changed) end
+		while not op(progress, amount) do
+			progress = coroutine.yield(progress < amount and progress or 0, int.Changed)
+		end
 		
 		return amount
 	end
 	
-	return thread, amount
+	return eval, amount
 end
 
 function Objective.timer(seconds:number, steps:number?)
 	local skip = if steps then seconds / math.clamp(steps, 1, seconds) else seconds
 	
-	local function thread(player:Player, progress:number)
+	local function eval(player:Player, progress:number)
 		local event = Instance.new("BindableEvent")
 		
 		while progress < seconds do
@@ -91,45 +117,37 @@ function Objective.timer(seconds:number, steps:number?)
 		return seconds
 	end
 	
-	return thread, seconds
+	return eval, seconds
 end
 
 function Objective.touch(touchPart:BasePart)
-	local function thread(player:Player, progress:number)
+	local function eval(player:Player, progress:number)
 		local hit
 		
-		repeat
-			hit = coroutine.yield(progress, touchPart.Touched)
+		repeat hit = coroutine.yield(progress, touchPart.Touched)
 		until hit.Parent == player.Character
 		
 		return 1
 	end
 	
-	return thread, 1
+	return eval, 1
 end
 
-function Objective.value(intValue:IntValue, amount:number)
-	local function thread(player:Player, progress:number)
-		while progress < amount do
-			progress = coroutine.yield(progress, intValue.Changed)
+function Objective.value(intValue:IntValue, amount:number, operator:string?)
+	local op = operator and ops[operator] or ops[">="]
+	
+	local function eval(player:Player, progress:number)
+		progress = intValue.Value
+		
+		while not op(progress, amount) do
+			progress = coroutine.yield(progress < amount and progress or 0, intValue.Changed)
 		end
 		
 		return amount
 	end
 	
-	return thread, amount
+	return eval, amount
 end
-
-local QuestLine = {
-	Event = "event",
-	Score = "score",
-	Timer = "timer",
-	Touch = "touch",
-	Value = "value",
-	
-	interval = 1.0
-}
-QuestLine.__index = QuestLine
 
 local questIndex:{[QuestLine]:string} = {}
 local questTable:{[string]:QuestLine} = {}
@@ -142,22 +160,19 @@ local objectiveCount:{[QuestLine]:number} = {}
 local objectiveTable:{[QuestLine]:{(plr:Player, prg:number)->(number, RBXScriptSignal?)}} = {}
 local objectiveValue:{[QuestLine]:{number}} = {}
 
-local EMPTY = "[QuestLine:%s] Quest is empty."
-local EXISTS = "[QuestLine:%s] Duplicate quest."
-local REGISTER = "[QuestLine:%s] Register %s."
-local NO_INDEX = "[QuestLine:%s] Index '%d' not found."
-local NO_ACCEPT = "[QuestLine:%s] %s could not accept."
-local NO_ASSIGN = "[QuestLine:%s] Could not assign %s."
-local NO_CANCEL = "[QuestLine:%s] Could not cancel %s."
-
 local dead, empty = coroutine.wrap(function () end)(), {}
 
 local function disconnect(player:Player, quest:QuestLine)
 	local conn = playerConnection[player][quest]
 	local obj = playerObjective[player][quest]
 	
-	if conn and conn.Connected then conn:Disconnect() end
-	if obj and coroutine.status(obj) ~= "dead" then coroutine.close(obj) end
+	if conn and conn.Connected then
+		conn:Disconnect()
+	end
+	
+	if obj and coroutine.status(obj) ~= "dead" then
+		coroutine.close(obj)
+	end
 	
 	playerConnection[player][quest] = nil
 	playerObjective[player][quest] = nil
@@ -177,15 +192,26 @@ function QuestLine.registerPlayer(player:Player, questData:{[string]:number})
 		
 		if not quest then continue end
 		
-		if 0 <= prg and not quest:IsComplete(player) then quest:Assign(player) end
+		if 0 <= prg and prg < objectiveCount[quest] then
+			quest:Assign(player)
+		end
 	end
 end
 
 function QuestLine.unregisterPlayer(player:Player):{[string]:number}
 	local res = playerProgress[player]
 	
-	for _, conn in pairs(playerConnection[player]) do if conn.Connected then conn:Disconnect() end end
-	for _, obj in pairs(playerObjective[player]) do if coroutine.status(obj) ~= "dead" then coroutine.close(obj) end end
+	for _, conn in pairs(playerConnection[player]) do
+		if conn.Connected then
+			conn:Disconnect()
+		end
+	end
+	
+	for _, obj in pairs(playerObjective[player]) do
+		if coroutine.status(obj) ~= "dead" then
+			coroutine.close(obj)
+		end
+	end
 	
 	playerConnection[player] = nil
 	playerObjective[player] = nil
@@ -194,14 +220,12 @@ function QuestLine.unregisterPlayer(player:Player):{[string]:number}
 	return res
 end
 
-function QuestLine.new(questId:string, self:any)
+function QuestLine.new(questId:string, self:{}?)
 	if not self then self = {} end
 	
 	setmetatable(self, QuestLine)
 	
 	questId = tostring(questId):sub(1, 50)
-	
-	assert(questTable[questId] == nil, EXISTS:format(questId))
 	
 	questIndex[self] = questId
 	questTable[questId] = self
@@ -232,9 +256,10 @@ end
 function QuestLine:Assign(player:Player)
 	local questId = questIndex[self]
 	
-	assert(playerProgress[player], REGISTER:format(questId, player and player.Name or "Unknown"))
-	assert(0 < objectiveCount[self], EMPTY:format(questId))
-	assert(not (self:IsComplete(player) or self:IsCanceled(player)), NO_ACCEPT:format(questId, player.Name))
+	if not playerProgress[player]
+		or objectiveCount[self] <= 0
+		or self:IsComplete(player)
+		or self:IsCanceled(player) then return warn("Could not assign", player.Name, "to", questId, ".") end
 	
 	local index = 1
 	local currentProgress, progress
@@ -312,7 +337,7 @@ function QuestLine:Assign(player:Player)
 end
 
 function QuestLine:Cancel(player:Player)
-	assert(self:IsAccepted(player), NO_CANCEL:format(player.Name))
+	if not self:IsAccepted(player) then return end
 	
 	disconnect(player, self)
 	
@@ -353,9 +378,7 @@ function QuestLine:GetCurrentProgress(player:Player):(number?, number?)
 end
 
 function QuestLine:GetObjectiveValue(index)
-	assert(objectiveValue[self][index], NO_INDEX:format(questIndex[self], index))
-	
-	return objectiveValue[self][index]
+	return objectiveValue[self] and objectiveValue[self][index]
 end
 
 function QuestLine:GetProgress(player:Player)
@@ -371,7 +394,6 @@ function QuestLine:IsCanceled(player:Player):boolean
 end
 
 function QuestLine:IsComplete(player)
-	local progress = self:GetProgress(player)
 	return self:IsAccepted(player) and objectiveCount[self] <= playerProgress[player][questIndex[self]]
 end
 
