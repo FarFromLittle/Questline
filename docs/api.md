@@ -15,7 +15,6 @@ Objective triggered by a roblox signal.
 |  *event*|`RBXScriptSignal`|*[required]*| A roblox signal.
 |  *count*|`number`         |1           | Expected trigger count.
 
-> **Example usage:**
 ```lua
 -- Knock on wood
 local trigger = workspace.Wood.ClickDetector.MouseClicked
@@ -33,7 +32,6 @@ Objective triggered by a leaderstat value.
 |*statName*|`string`|*[required]*| The name of the leaderstat to track.
 |*amount*  |`number`|*[required]*| Value to consider complete.
 
-> **Example usage:**
 ```lua
 -- Score 10 points on leaderstats
 myQuest:AddObjective(QuestLine.Score, "Points", 10)
@@ -50,7 +48,6 @@ A time based objective.
 |*count*  |`number`|*[required]*| Number of seconds to wait.
 |*steps*  |`number`|1           | Steps of progress counted.
 
-> **Example usage:**
 ```lua
 -- Wait 5 seconds, counting progress each second
 myQuest:AddObjective(QuestLine.Timer, 5, 5)
@@ -66,7 +63,6 @@ Objective based on a touch event.
 |----------:|:--------:|:----------:|:----------
 |*touchPart*|`BasePart`|*[required]*| A touchable part within the workspace.
 
-> **Example usage:**
 ```lua
 -- Return to dropoff
 myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
@@ -83,7 +79,6 @@ Objective based on an IntValue.
 | *intVal*|`IntValue`|*[required]*| A reference to an IntValue.
 |  *count*|`number`  |*[required]*| Value to consider complete.
 
-> **Example usage:**
 ```lua
 -- Track kills
 myQuest:AddObjective(QuestLine.Value, player.EnemiesKilled, 5)
@@ -116,7 +111,6 @@ Creates a new questline.
 |:----------|:----------
 |*QuestLine*| A new QuestLine.
 
-> **Example usage:**
 ```lua
 local myQuest = QuestLine.new("myQuestId", {...})
 ```
@@ -135,7 +129,6 @@ Returns a quest created with the given *questId*.
 |----------:|:----------
 |`QuestLine`| The quest identified by *questId*.
 
-> **Example usage:**
 ```lua
 local myQuest = QuestLine.getQuestById("myQuestId")
 ```
@@ -150,8 +143,6 @@ Registers a player with the quest system and loads the player's progress.
 |-----------:|:-----------------:|:----------:|:----------
 |*player*    |`Player`           |*[required]*| The player to register.
 |*playerData*|`{[string]:number}`|*[required]*| The player's progression table.
-
-> **Example usage:**
 
 ```lua
 -- start with new data or load from datastore
@@ -176,8 +167,6 @@ Unregisters the player from the quest system and returns the player's progress.
 |:------------------|:----------
 |`{[string]:number}`| The player's progression table.
 
-> **Example usage:**
-
 ```lua
 -- save the returned data to datastore
 local playerData = QuestLine.unregister(player)
@@ -201,8 +190,6 @@ Adds a new objective according to the given objective type.  Additional paramete
 |:-------|:----------
 |`number`| The index of the created objective within the *Questline*.
 
-> **Example usage:**
-
 ```lua
 local index = myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 ```
@@ -217,8 +204,6 @@ Assigns a *player* to a quest.  Triggers *OnAccept* if the quest was previously 
 |--------:|:------:|:----------:|:----------
 |*player* |`Player`|*[required]*| The player to assign.
 
-> **Example usage:**
-
 ```lua
 myQuest:Assign(player)
 ```
@@ -232,8 +217,6 @@ Causes the *player* to cancel/fail the current quest.  Triggers the *OnCancel* e
 |Parameter|Type    |Default     |Description
 |--------:|:------:|:----------:|:----------
 |*player* |`Player`|*[required]*| The player to cancel the quest on.
-
-> **Example usage:**
 
 ```lua
 myQuest:Cancel(player)
@@ -254,8 +237,6 @@ Retrieves an objective's progress for a player.
 |`number`| The current progress of the *player* within the objective.
 |`number`| The index of the current objective within the *Questline*.
 
-> **Example usage:**
-
 ```lua
 local currentProgress, index = myQuest:GetCurrentProgress(player)
 ```
@@ -273,8 +254,6 @@ Retrieves an objective's total progress needed to pass.
 |Return  |Description
 |:-------|:----------
 |`number`| The objective's maximum progression.
-
-> **Example usage:**
 
 ```lua
 local value = myQuest:GetObjectiveValue(index)
@@ -294,8 +273,6 @@ Retrieves a player's progression for the entire quest, not just the current obje
 |:-------|:----------
 |`number`| The *player*'s progress within the questline.
 
-> **Example usage:**
-
 ```lua
 local progress = myQuest:GetProgress(player)
 ```
@@ -313,8 +290,6 @@ Checks if the quest is accepted by the *player*.  A quest is only accepted when 
 |Return   |Description
 |:--------|:----------
 |`boolean`| Determines if the quest is accepted.
-
-> **Example usage:**
 
 ```lua
 if myQuest:IsAccepted(player) then
@@ -336,8 +311,6 @@ Checks if the quest is canceled for the *player*.
 |:--------|:----------
 |`boolean`| Determines if the quest is canceled.
 
-> **Example usage:**
-
 ```lua
 if myQuest:IsCanceled(player) then
     -- Where did I go wrong?
@@ -358,8 +331,6 @@ Checks if the *player* has completed the quest.
 |:--------|:----------
 |`boolean`| Determines if the quest is complete.
 
-> **Example usage:**
-
 ```lua
 if myQuest:IsCompete(player) then
     -- Yeah, I did that!
@@ -379,8 +350,6 @@ Called at the beginning of a quest and only when it's first initialized.  This c
 |---------:|:------:|:----------
 |*player*  |`Player`| A reference to the player.
 
-> **Example usage:**
-
 ```lua
 function myQuest:OnAccept(player)
     -- Run code upon initialization
@@ -396,8 +365,6 @@ Called each time the player is assigned the quest.  This runs after a quest is f
 |Parameter |Type    |Description
 |---------:|:------:|:----------
 |*player*  |`Player`| A reference to the player.
-
-> **Example usage:**
 
 ```lua
 function myQuest:OnAssign(player)
@@ -452,8 +419,6 @@ Called when a player has made progress.  For the first time, progress will be ze
 |*player*  |`Player`| A reference to the player.
 |*progress*|`number`| The objective's progress for the player.
 |*index*   |`number`| The objective's index within the quest.
-
-> **Example usage:**
 
 ```lua
 function myQuest:OnProgress(player, progress, index)
