@@ -175,11 +175,6 @@ Unregisters the player from the quest system and returns the player's progress.
 |:------------------|:----------
 |`{[string]:number}`| The player's progression table.
 
-> **Example usage:**
-```lua
-local playerData = QuestLine.unregister(player)
-```
-
 Public Methods
 --------------
 
