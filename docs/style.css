@@ -235,12 +235,12 @@ a:hover {
 }
 .content table tr {
   border-top: 1px solid #ccc;
-  background-color: #fff;
+  background-color: #f8f8f8;
   margin: 0;
   padding: 0;
 }
-.content table tr :nth-of-type(odd) {
-  background-color: #f8f8f8;
+.content tr :nth-child(even) {
+  background-color: #fff;
 }
 .content table tr th {
   text-align: auto;
