@@ -235,14 +235,15 @@ a:hover {
 }
 .content table tr {
   border-top: 1px solid #ccc;
-  background-color: #f8f8f8;
+  background-color: #fff;
   margin: 0;
   padding: 0;
 }
-tr:nth-child(odd) {
-  background-color: #fff;
-}
+/*.content table tr :nth-child(odd) {
+  background-color: #f8f8f8;
+}*/
 .content table tr th {
+  background-color: #f8f8f8;
   text-align: auto;
   font-weight: bold;
   border: 1px solid #ccc;
