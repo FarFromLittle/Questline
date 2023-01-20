@@ -311,7 +311,6 @@ a:hover {
 }
 .content h1,
 .content h2 {
-  text-transform: uppercase;
   letter-spacing: 1px;
   font-size: 1.5em;
 }
