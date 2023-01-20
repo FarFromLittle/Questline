@@ -239,7 +239,7 @@ a:hover {
   margin: 0;
   padding: 0;
 }
-.content table :nth-child(even) {
+.content tr :nth-child(odd) {
   background-color: #fff;
 }
 .content table tr th {
