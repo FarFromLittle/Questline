@@ -1,11 +1,14 @@
-Getting Started
----------------
-
 QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of a series of objectives.
 
 The module itself does not include data storage or visual elements.
 
 Instead, it offers a framework to create customized quest systems that are event-driven and easily maintained.
+
+It comes as a single modulescript, without dependencies, and needs only to be required on the server.
+
+``` lua
+local QuestLine = require(game.ServerStorage.QuestLine)
+```
 
 Creating QuestLines
 -------------------
@@ -39,11 +42,11 @@ There are a total five objective types.
 
 | Type | Description
 |-----:|:-----------
-| [Event](https://farfromlittle.github.io/QuestLine/api.html#enums-questlineevent) | A generic, event-based objective.
-| [Score](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinescore) | An objective based on the value of a leaderstat.
-| [Timer](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinetimer) | A time-based objective.
-| [Touch](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinetouch) | A touch-based objective.
-| [Value](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinevalue) | An objective based on the value of a given *IntValue*.
+|[Event](https://farfromlittle.github.io/QuestLine/api.html#enums-questlineevent) | A generic, event-based objective.
+|[Score](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinescore) | An objective based on the value of a leaderstat.
+|[Timer](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinetimer) | A time-based objective.
+|[Touch](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinetouch) | A touch-based objective.
+|[Value](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinevalue) | An objective based on the value of a given *IntValue*.
 
 ``` lua
 -- Example usage:
@@ -99,56 +102,32 @@ Events are triggered using callbacks related to the various stages of progressio
 
 Events are fired in the following order:
 
-### [OnAccept(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonaccept)
+### [OnAccept()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonaccept)
 * Fired when a player is assigned a previously unknown questline.
 * Only fired once during the lifecycle of a questline.
 
-``` lua
-function QuestLine:OnAccept(player)
-    print(player, "accepted", self)
-end
-```
-
-### [OnAssign(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign)
+### [OnAssign()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign)
 * Fired each time a player is assigned the questline.
 * This includes when a player resumes progress from a previous session.
   
-``` lua
-function QuestLine:OnAssign(player)
-    print(player, "was assigned", self)
-end
-```
-
-### [OnProgress(player:Player, progress:number, index:number)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonprogress)
+### [OnProgress()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonprogress)
 * Triggers at each step of progression.  Based on the current objective.
 * The first event fires with zero progress, and lastly, with [GetObjectiveValue(index)](https://farfromlittle.github.io/QuestLine/api.html#public-methods-getobjectivevalue).
 
-``` lua
-function QuestLine:OnProgress(player, progress, index)
-    print(player, "has", progress, "out of", self:GetObjectiveValue(index))
-end
-```
-
-### [OnComplete(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineoncomplete)
+### [OnComplete()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineoncomplete)
 * Fired when a player has reached the end of the questline.
+
+### [OnCancel()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineoncancel)
+* Only triggered by a call to `myQuest:Cancel(player)`.
+* Can be used to fail a questline, and re-accepted later on.
+
+A typical questline is managed by a global callback function.
 
 ``` lua
 function QuestLine:OnComplete(player)
     print(player, "completed", self)
 end
 ```
-
-### [OnCancel(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineoncancel)
-* Only triggered by a call to `myQuest:Cancel(player)`.
-* Can be used to fail a questline, and re-accepted later on.
-
-``` lua
-function QuestLine:OnCancel(player)
-    print(player, "canceled", self)
-end
-```
-
-A typical questline is managed by a global callback function.
 
 Local callbacks can be defined on individual questlines, but you may need to make a call to the global one as well.
 
