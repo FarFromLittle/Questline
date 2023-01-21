@@ -1,5 +1,5 @@
 Getting Started
-=========
+---------------
 
 QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of a series of objectives.
 
@@ -29,11 +29,11 @@ Adding Objectives
 
 A questline consists of one or more objectives.  Progress moves from one objective to the next until it's complete.
 
+[AddObjective()](api.html#public-methods-addobjective) first requires one of the objective types.  The rest of the parameters are dependant on the type of objective being added.
+
 ``` lua
 myQuest:AddObjective(objType, ...any)
 ```
-
-The first parameter refers to one of the objective types.  The rest are dependant on the type of objective being added.
 
 There are a total five objective types.
 
@@ -46,9 +46,7 @@ There are a total five objective types.
 | [Value](api.html#enums-questlinevalue) | An objective based on the value of a given *IntValue*.
 
 ``` lua
--- Wait for player to activate
-local prompt = workspace.Activate.ProximityPrompt
-myQuest:AddObjective(QuestLine.Event, prompt.Triggered)
+-- Example usage:
 
 -- reach level 10 on leaderstats
 myQuest:AddObjective(QuestLine.Score, "Level", 10)
@@ -58,9 +56,6 @@ myQuest:AddObjective(QuestLine.Timer, 360, 60)
 
 -- Wait for player to touch a given part
 myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
-
--- Continue after reaching 10 kills
-myQuest:AddObjective(QuestLine.Value, player.EnemiesKilled, 10)
 ```
 
 Each objective has it's own set of parameters.  Refer to the [api](api.html#enums) for a detailed explanation of each objective type.
@@ -105,8 +100,9 @@ Events are triggered using callbacks related to the various stages of progressio
 Events are fired in the following order:
 
 `OnAccept(player:Player)`
-* Fires when a player is assigned a previously unknown questline.
-  
+* Fired when a player is assigned a previously unknown questline.
+* Only fired once during the lifecycle of a questline.
+
 ``` lua
 function QuestLine:OnAccept(player)
     print(player, "accepted", self)
@@ -114,20 +110,19 @@ end
 ```
 
 `OnAssign(player:Player)`
-* Fires each time a player is assigned the questline.
+* Fired each time a player is assigned the questline.
 * This includes when a player resumes progress from a previous session.
   
 ``` lua
 function QuestLine:OnAssign(player)
-    print(player, "assigned", self)
+    print(player, "was assigned", self)
 end
 ```
 
-`OnProgress(player:Player, progress:number, objIndex:number)`
-* Triggers at each step of progression.
-* The first event fires with `progress = 0`
-* Lastly with `progress = myQuest:GetObjectiveValue(objIndex)`.
-  
+`OnProgress(player:Player, progress:number, index:number)`
+* Triggers at each step of progression.  Based on the current objective.
+* The first event fires with zero progress, and lastly, with [GetObjectiveValue(index)](api.html#public-methods-getobjectivevalue).
+
 ``` lua
 function QuestLine:OnProgress(player, progress, index)
     print(player, "has", progress, "out of", self:GetObjectiveValue(index))
@@ -135,7 +130,7 @@ end
 ```
 
 `OnComplete(player:Player)`
-* Fires when a player has completed the questline.
+* Fired when a player has reached the end of the questline.
 
 ``` lua
 function QuestLine:OnComplete(player)
@@ -145,8 +140,7 @@ end
 
 `OnCancel(player:Player)`
 * Only triggered by a call to `myQuest:Cancel(player)`.
-* Can be used to fail a questline.
-* A canceled questline can be re-accepted.
+* Can be used to fail a questline, and re-accepted later on.
 
 ``` lua
 function QuestLine:OnCancel(player)
@@ -154,7 +148,11 @@ function QuestLine:OnCancel(player)
 end
 ```
 
-A typical questline is managed by a global callback function.  Local callbacks can be defined on individual questlines, but you may need to make a call to the global one as well.
+A typical questline is managed by a global callback function.
+
+Local callbacks can be defined on individual questlines, but you may need to make a call to the global one as well.
+
+The global callback will not run when a local one has been assigned.  This makes it necessary to do it manually.
 
 ``` lua
 function myQuest:OnComplete(player)
@@ -163,12 +161,11 @@ function myQuest:OnComplete(player)
 end
 ```
 
-The global callback will not run when a local one has been assigned.  This makes it necessary to do it manually.
+Be aware that you can only set a callback once per context (global or local).  Setting it again will overwrite the previous behavior.
 
-Be aware that you can only set a callback once per context (global or local).
-Setting it again will overwrite the previous behavior.
+As a side note, the module itself *does not* use these callbacks and are reserved for your customization.
 
-> Take note that both examples use a colon `:` when defining the method, which means *self* is implied.  However, when calling the global callback, a period `.` is used and *self* is passed along with the player.
+> Take note that the examples use a colon `:` to define the method, which means *self* is implied.  However, when calling the global callback, a period `.` is used and *self* is passed along with the player.
 
 Saving Player Data
 ------------------
