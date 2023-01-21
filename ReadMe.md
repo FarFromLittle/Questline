@@ -18,7 +18,7 @@ local myQuest = QuestLine.new("myQuestId", { Title = "My First Quest" })
 
 The optional second parameter allows you to specify a table for *self*.
 
-After a questline is created, it can later be retrieved with a call to [`QuestLine.getQuestById()`](api.html#static-members-questlinegetquestbyid).
+After a questline is created, it can later be retrieved with a call to [getQuestById()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlinegetquestbyid).
 
 ``` lua
 local myQuest = QuestLine.getQuestById("myQuestId")
@@ -29,7 +29,7 @@ Adding Objectives
 
 A questline consists of one or more objectives.  Progress moves from one objective to the next until it's complete.
 
-[AddObjective()](api.html#public-methods-addobjective) first requires one of the objective types.  The rest of the parameters are dependant on the type of objective being added.
+[AddObjective()](https://farfromlittle.github.io/QuestLine/api.html#public-methods-addobjective) first requires one of the objective types.  The rest of the parameters are dependant on the type of objective being added.
 
 ``` lua
 myQuest:AddObjective(objType, ...any)
@@ -39,11 +39,11 @@ There are a total five objective types.
 
 | Type | Description
 |-----:|:-----------
-| [Event](api.html#enums-questlineevent) | A generic, event-based objective.
-| [Score](api.html#enums-questlinescore) | An objective based on the value of a leaderstat.
-| [Timer](api.html#enums-questlinetimer) | A time-based objective.
-| [Touch](api.html#enums-questlinetouch) | A touch-based objective.
-| [Value](api.html#enums-questlinevalue) | An objective based on the value of a given *IntValue*.
+| [Event](https://farfromlittle.github.io/QuestLine/api.html#enums-questlineevent) | A generic, event-based objective.
+| [Score](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinescore) | An objective based on the value of a leaderstat.
+| [Timer](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinetimer) | A time-based objective.
+| [Touch](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinetouch) | A touch-based objective.
+| [Value](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinevalue) | An objective based on the value of a given *IntValue*.
 
 ``` lua
 -- Example usage:
@@ -58,12 +58,12 @@ myQuest:AddObjective(QuestLine.Timer, 360, 60)
 myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
 ```
 
-Each objective has it's own set of parameters.  Refer to the [api](api.html#enums) for a detailed explanation of each objective type.
+Each objective has it's own set of parameters.  Refer to the [api](https://farfromlittle.github.io/QuestLine/api.html#enums) for a detailed explanation of each objective type.
 
 Registering Players
 -------------------
 
-Players must first register with the system before questlines can be assigned.  A call to [register()](api.html#static-members-questlineregister) requires the *player* and a table containing their progress.
+Players must first register with the system before questlines can be assigned.  A call to [register()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlineregister) requires the *player* and a table containing their progress.
 
 ``` lua
 QuestLine.registerPlayer(player, playerData)
@@ -88,9 +88,9 @@ Once a player is registered, they are ready to be assigned quests.
 myQuest:Assign(player)
 ```
 
-If no entry is found in the player's progress table, the [OnAccept()](api.html#events-questlineonaccept) callback will fire and `myQuestId = 0` will be added.
+If no entry is found in the player's progress table, the [OnAccept()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonaccept) callback will fire and `myQuestId = 0` will be added.
 
-When a player is initially registered, all questlines not found to be complete, or canceled, will automatically be assigned.  This triggers the [OnAssign()](api.html#events-questlineonassign) callback.
+When a player is initially registered, all questlines not found to be complete, or canceled, will automatically be assigned.  This triggers the [OnAssign()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign) callback.
 
 Handling Progression
 --------------------
@@ -121,7 +121,7 @@ end
 
 `OnProgress(player:Player, progress:number, index:number)`
 * Triggers at each step of progression.  Based on the current objective.
-* The first event fires with zero progress, and lastly, with [GetObjectiveValue(index)](api.html#public-methods-getobjectivevalue).
+* The first event fires with zero progress, and lastly, with [GetObjectiveValue(index)](https://farfromlittle.github.io/QuestLine/api.html#public-methods-getobjectivevalue).
 
 ``` lua
 function QuestLine:OnProgress(player, progress, index)
