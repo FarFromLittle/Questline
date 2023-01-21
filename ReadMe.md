@@ -99,7 +99,7 @@ Events are triggered using callbacks related to the various stages of progressio
 
 Events are fired in the following order:
 
-`OnAccept(player:Player)`
+### [OnAccept(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonaccept)
 * Fired when a player is assigned a previously unknown questline.
 * Only fired once during the lifecycle of a questline.
 
@@ -109,7 +109,7 @@ function QuestLine:OnAccept(player)
 end
 ```
 
-`OnAssign(player:Player)`
+### [OnAssign(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign)
 * Fired each time a player is assigned the questline.
 * This includes when a player resumes progress from a previous session.
   
@@ -119,7 +119,7 @@ function QuestLine:OnAssign(player)
 end
 ```
 
-`OnProgress(player:Player, progress:number, index:number)`
+### [OnProgress(player:Player, progress:number, index:number)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonprogress)
 * Triggers at each step of progression.  Based on the current objective.
 * The first event fires with zero progress, and lastly, with [GetObjectiveValue(index)](https://farfromlittle.github.io/QuestLine/api.html#public-methods-getobjectivevalue).
 
@@ -129,7 +129,7 @@ function QuestLine:OnProgress(player, progress, index)
 end
 ```
 
-`OnComplete(player:Player)`
+### [OnComplete(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineoncomplete)
 * Fired when a player has reached the end of the questline.
 
 ``` lua
@@ -138,7 +138,7 @@ function QuestLine:OnComplete(player)
 end
 ```
 
-`OnCancel(player:Player)`
+### [OnCancel(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineoncancel)
 * Only triggered by a call to `myQuest:Cancel(player)`.
 * Can be used to fail a questline, and re-accepted later on.
 
