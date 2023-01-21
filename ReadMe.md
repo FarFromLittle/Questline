@@ -1,112 +1,121 @@
-QuestLine
+Getting Started
 =========
 
-QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of linear quests.
+QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of a series of objectives.
 
 The module itself does not include data storage or visual elements.
 
 Instead, it offers a framework to create customized quest systems that are event-driven and easily maintained.
 
-Getting Started
----------------
+Creating QuestLines
+-------------------
 
-QuestLines are created with a call to *new*; only requiring a *questId*.
+QuestLines are created with a call to *new*.  This requires a unique string used to store the questline within the system.
 
-```lua
-local myQuest = QuestLine.new("myQuestId")
+``` lua
+
+local myQuest = QuestLine.new("myQuestId", { Title = "My First Quest" })
+
 ```
 
-The *questId* is a unique string used to store the questline within the system.
+The optional second parameter allows you to specify a table for *self*.
 
-> The questline can later be referenced as follows:
+After a questline is created, it can later be retrieved with a call to [`QuestLine.getQuestById()`](api.html#static-members-questlinegetquestbyid).
 
-```lua
+``` lua
+
 local myQuest = QuestLine.getQuestById("myQuestId")
+
 ```
 
 Adding Objectives
-=================
+-----------------
 
-A *QuestLine* consists of one or more objectives in a sequence.  Progress moves from one objective to the next until the questline is complete.
+A questline consists of one or more objectives.  Progress moves from one objective to the next until it's complete.
 
-The first parameter refers to one of the objective types.  The rest of the parameters are dependant on the type of objective added.
+``` lua
 
-> Adding an objective takes the following form:
-
-```lua
 myQuest:AddObjective(objType, ...any)
+
 ```
+
+The first parameter refers to one of the objective types.  The rest are dependant on the type of objective being added.
 
 Objectives
 ----------
 
-There are a total five objective types.  Each having their own set of parameters.
+There are a total five objective types.
 
-### Event
+| Type | Description
+|-----:|:-----------
+| [Event](api.html#enums-questlineevent) | A generic, event-based objective.
+| [Score](api.html#enums-questlinescore) | An objective based on the value of a leaderstat.
+| [Timer](api.html#enums-questlinetimer) | A time-based objective.
+| [Touch](api.html#enums-questlinetouch) | A touch-based objective.
+| [Value](api.html#enums-questlinevalue) | An objective based on the value of a given *IntValue*.
 
-A generic, event-based objective.
+``` lua
 
-This objective connects to a Roblox signal and waits for it to be fired a number of times.
+-- Wait for player to activate
+local prompt = workspace.Activate.ProximityPrompt
+myQuest:AddObjective(QuestLine.Event, prompt.Triggered)
 
-### Score
+-- reach level 10 on leaderstats
+myQuest:AddObjective(QuestLine.Score, "Level", 10)
 
-An objective based on the value of a leaderstat.
+-- wait 360 seconds (one hour), count whole minutes
+myQuest:AddObjective(QuestLine.Timer, 360, 60)
 
-By default, this objective monitors a leaderstat until it is ```>=``` the given value.  This behavior can be changed using the optional *operation* parameter.
-
-### Timer
-
-A time-based objective.
-
-This introduces a delay before moving on to the next objective.
-
-### Touch
-
-A touch-based objective.
-
-This objective requires the assigned player to come in contact with a part.
-
-### Value
-
-An objective based on the value of a given *IntValue*.
-
-```lua
-myQuest:AddObjective(QuestLine.Score, "Apples", 3)
+-- Wait for player to touch a given part
 myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
+
+-- Continue after reaching 10 kills
+myQuest:AddObjective(QuestLine.Value, player.EnemiesKilled, 10)
+
 ```
 
-Adding Players
---------------
+Each objective has it's own set of parameters.  Refer to the [api](api.html#enums) for a detailed explanation of each objective type.
 
-Players must first register with the system before being assigned a questline.
-This takes an instance of *player* and their progress table loaded from a datastore.
+Registering Players
+-------------------
 
-```lua
-QuestLine.registerPlayer(player, playerData)
+Players must first register with the system before questlines can be assigned.  A Call to [register()](api.html#static-members-questlineregister) requires the *player* and a table containing their progress.
+
+``` lua
+
+game.Players.PlayerAdded:Connect(function (player)
+	-- start with fresh table or load from datastore
+	local playerData = {
+		myQuestId = 0 -- assign zero for auto-accept
+	}
+	
+	QuestLine.registerPlayer(player, playerData)
+end
+
 ```
 
-Player progression is stored in a table under the key supplied by *questId*.
+Player progression is stored in a table under the key supplied by *questId*.  The value is stored as a integer.
 
 Additionally, this table can be pre-populated with starter quests by assigning zero to an entry.
-
-```lua
-local playerData = {
-	myQuestId = 0 -- Assign zero for auto-accept
-}
-```
 
 Assigning QuestLines
 --------------------
 
 Once a player is registered, they are ready to be assigned quests.
 
-```lua
+``` lua
+
+...
+
+QuestLine.register(player, playerProgress)
+
 myQuest:Assign(player)
+
 ```
 
-This will fire the *OnAccept()* callback and add an entry of `myQuestId = 0` to the player's progress table.
+If no entry is found in the player's progress table, the [OnAccept()](api.html#events-questlineonaccept) callback will fire and `myQuestId = 0` will be added.
 
-When a player is registered, all questlines not found to be complete will automatically be assigned.
+When a player is initially registered, all questlines not found to be complete, or canceled, will automatically be assigned.  This triggers the [OnAssign()](api.html#events-questlineonassign) callback.
 
 Handling Progression
 --------------------
@@ -115,40 +124,43 @@ Events are triggered using callbacks related to the various stages of progressio
 
 Events are fired in the following order:
 
-* `OnAccept(player:Player)`
-  * Fires when a player is assigned a previously unknown questline.
+`OnAccept(player:Player)`
+* Fires when a player is assigned a previously unknown questline.
   
-* `OnAssign(player:Player)`
-  * Fires each time a player is assigned the questline.
-  * This includes when a player resumes progress from a previous session.
+`OnAssign(player:Player)`
+* Fires each time a player is assigned the questline.
+* This includes when a player resumes progress from a previous session.
   
-* `OnProgress(player:Player, progress:number, objIndex:number)`
-  * Triggers at each step of progression.
-  * The first event fires with `progress = 0`
-  * Lastly with `progress = myQuest:GetObjectiveValue(objIndex)`.
+`OnProgress(player:Player, progress:number, objIndex:number)`
+* Triggers at each step of progression.
+* The first event fires with `progress = 0`
+* Lastly with `progress = myQuest:GetObjectiveValue(objIndex)`.
   
-* `OnComplete(player:Player)`
-  * Fires when a player has completed the questline.
+`OnComplete(player:Player)`
+* Fires when a player has completed the questline.
   
-* `OnCancel(player:Player)`
-  * Only triggered by a call to `myQuest:Cancel(player)`.
-  * Can be used to fail a questline.
-  * A canceled questline can be re-accepted.
+`OnCancel(player:Player)`
+* Only triggered by a call to `myQuest:Cancel(player)`.
+* Can be used to fail a questline.
+* A canceled questline can be re-accepted.
 
 A typical questline is managed by a global callback function.  
 
-```lua
+``` lua
+
 -- Define a global complete callback
 function QuestLine:OnComplete(player)
     print(player.Name, "completed", self)
 end
+
 ```
 
 Local callbacks can also be defined on individual questlines, but you may need to make a call to the global one as well.
 
 The global callback will not run when a local one has been assigned.  This makes it necessary to do it manually.
 
-```lua
+``` lua
+
 local myQuest = QuestLine.new("myQuestId")
 
 function myQuest:OnComplete(player)
@@ -157,22 +169,28 @@ function myQuest:OnComplete(player)
     
     -- Run custom myQuest code
 end
+
 ```
 
-> Take note that both examples use a colon `:` when defining the method, which means *self* is implied.
-However, when calling the global callback, a period `.` is used and *self* is passed along with the player.
+> Take note that both examples use a colon `:` when defining the method, which means *self* is implied.  However, when calling the global callback, a period `.` is used and *self* is passed along with the player.
 
 Be aware that you can only set a callback once per context (global or local).
 Setting it again will overwrite the previous behavior.
 
-Removing Players
-----------------
+Saving Player Data
+------------------
 
-Upon leaving the game, the player needs to be unregistered too.
+When a player leaves the game, they need to be unregistered from the system.
 
-```lua
-local playerData = QuestLine.unregisterPlayer(player)
+``` lua
+
+game.Players.PlayerRemoving:Connect(player)
+	local playerData = QuestLine.unregisterPlayer(player)
+	
+	-- save player data to datastore
+end
+
 ```
 
-This does some cleanup and returns the player's progress to be saved in a datastore.
+This returns a simple table containing the player's progress to be saved in a datastore.
 
