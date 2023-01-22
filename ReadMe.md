@@ -6,7 +6,7 @@ The module itself does not include data storage or visual elements.
 
 Instead, it offers a framework to create customized quest systems that are event-driven and easily maintained.
 
-It comes as a single modulescript, without dependencies, and needs only to be required on the server.
+It has no dependencies, and need only be required on the server.
 
 ``` lua
 local QuestLine = require(game.ServerStorage.QuestLine)
@@ -68,7 +68,7 @@ Each objective has it's own set of parameters.  Refer to the [api](https://farfr
 Registering Players
 -------------------
 
-Players must first register with the system before questlines can be assigned.  A call to [register()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlineregisterplayer) requires the *player* and a table containing their progress.
+Players must first register with the system before questlines can be assigned.  A call to [registerPlayer()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlineregisterplayer) requires the *player* and a table containing their progress.
 
 ``` lua
 QuestLine.registerPlayer(player, playerData)
