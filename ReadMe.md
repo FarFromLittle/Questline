@@ -18,10 +18,10 @@ Creating QuestLines
 QuestLines are created with a call to *new*.  This requires a unique string used to store the questline within the system.
 
 ``` lua
-local myQuest = QuestLine.new("myQuestId", { Title = "My First Quest" })
+local myQuest = QuestLine.new("myQuestId", { Title = "My First Quest", ... })
 ```
 
-The optional second parameter allows you to specify a table for *self*.
+The optional second parameter allows you to specify a table for *self*.  This is useful to store information to access within the event handlers.
 
 After a questline is created, it can later be retrieved with a call to [getQuestById()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlinegetquestbyid).
 
@@ -51,12 +51,12 @@ There are a total five objective types.
 |[Value](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinevalue) | An objective based on the value of a given *IntValue*.
 
 ``` lua
--- Example usage:
+-- Examples:
 
--- reach level 10 on leaderstats
+-- Reach level 10 on leaderstats
 myQuest:AddObjective(QuestLine.Score, "Level", 10)
 
--- wait 360 seconds (one hour), count whole minutes
+-- Wait 360 seconds (one hour), count by minutes
 myQuest:AddObjective(QuestLine.Timer, 360, 60)
 
 -- Wait for player to touch a given part
@@ -93,50 +93,24 @@ Once a player is registered, they are ready to be assigned quests.
 myQuest:Assign(player)
 ```
 
-If no entry is found in the player's progress table, the [OnAccept()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonaccept) callback will fire and `myQuestId = 0` will be added.
+If no entry is found in the player's progress table, the [OnAccept()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonaccept) callback will fire and `myQuestId = 0` will be added.  Afterwards, the [OnAssign()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign) callback is triggered.
 
-When a player is initially registered, all questlines not found to be complete, or canceled, will automatically be assigned.  This triggers the [OnAssign()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign) callback.
+When a player is initially registered, all questlines not found to be complete, or canceled, will automatically be assigned.
 
 Tracking Progress
 -----------------
 
-Events are triggered using callbacks related to the various stages of progression.
+Events are triggered using callbacks related to the various stages of progress.
 
 Events are fired in the following order:
 
-#### [OnAccept()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonaccept)
+* [OnAccept(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonaccept)
 
-`QuestLine.OnAccept(player:Player)`
-
-* Fired when a player is assigned a previously unknown questline.
-* Only fired once during the lifecycle of a questline.
-
-#### [OnAssign()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign)
-
-`QuestLine.OnAssign(player:Player)`
-
-* Fired each time a player is assigned the questline.
-* This includes when a player resumes progress from a previous session.
+* [OnAssign(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign)
   
-#### [OnProgress()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonprogress)
+* [OnProgress(player:Player, progress:number, index:number)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonprogress)
 
-`QuestLine.OnProgress(player:Player, progress:number, index:number)`
-
-* Triggers at each step of progression.  Based on the current objective.
-* The first event fires with zero progress, and lastly, with [GetObjectiveValue(index)](https://farfromlittle.github.io/QuestLine/api.html#public-methods-getobjectivevalue).
-
-#### [OnComplete()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineoncomplete)
-
-`QuestLine.OnComplete(player:Player)`
-
-* Fired when a player has reached the end of the questline.
-
-#### [OnCancel()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineoncancel)
-
-`QuestLine.OnCancel(player:Player)`
-
-* Only triggered by a call to [Cancel()](https://farfromlittle.github.io/QuestLine/api.html#public-methods-cancel).
-* Can be used to fail a questline, and re-accepted later on.
+* [OnComplete(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineoncomplete)
 
 A typical questline is managed by a global callback function.
 
@@ -146,9 +120,9 @@ function QuestLine:OnComplete(player)
 end
 ```
 
-Local callbacks can be defined on individual questlines, but you may need to make a call to the global one as well.
+Callbacks can be defined on individual questlines, but you may need to make a call to the global one as well.
 
-The global callback will not run when a local one has been assigned.  This makes it necessary to do it manually.
+The global callback will not run when one is defined on the questline.  This makes it necessary to do it manually.
 
 ``` lua
 function myQuest:OnComplete(player)
@@ -157,9 +131,7 @@ function myQuest:OnComplete(player)
 end
 ```
 
-Be aware that you can only set a callback once per context (global or local).  Setting it again will overwrite the previous behavior.
-
-As a side note, the module itself *does not* use these callbacks and are reserved for your customization.
+Be aware that you can only set a callback once per context.  Setting it again will overwrite the previous behavior.
 
 Saving Player Data
 ------------------
@@ -171,3 +143,5 @@ local playerData = QuestLine.unregisterPlayer(player)
 ```
 
 This returns a simple table containing the player's progress to be saved in a datastore.
+
+When a player rejoins, pass this back to [registerPlayer()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlineregisterplayer) to continue progress.
