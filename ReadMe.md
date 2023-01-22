@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/FarFromLittle/QuestLine/main/docs/QuestLineBanner.png" alt="QuestLine" />
+
 QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of quests.
 
 The module itself does not include data storage or visual elements.
