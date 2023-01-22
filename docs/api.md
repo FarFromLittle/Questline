@@ -20,7 +20,7 @@ local trigger = workspace.Wood.ClickDetector.MouseClicked
 myQuest:AddObjective(QuestLine.Event, trigger, 3)
 ```
 
-#### Comparision Function
+#### The comparision function
 
 The optional *compare* function receives the player as the first argument, followed by the results of the triggered event, and should return a boolean.
 
@@ -30,9 +30,9 @@ function compare(plr, arg) return plr == arg end
 ```
 
 This is appropiate for events including:
+* The *OnServerEvent* of a RemoteEvent.
 * The *Triggerd* event of a ProximityPrompt.
 * The *MouseClick* event of a ClickDetector.
-* The *OnServerEvent* of a RemoteEvent.
 
 QuestLine.Score
 ---------------
@@ -40,6 +40,8 @@ QuestLine.Score
 `string:"score"` `readonly`
 
 Objective triggered by a leaderstat value.
+
+By default, the leaderstat must be `>=` to the given value.
 
 |Parameter |Type    |Default     |Description
 |---------:|:------:|:----------:|:----------
@@ -208,7 +210,7 @@ Adds a new objective according to the given objective type.  Additional paramete
 |Parameter|Type    |Default     |Description
 |--------:|:------:|:----------:|:----------
 |*objType*|`string`|*[required]*| The desired objective type to construct.
-|*...*    |`...any`|*[required]*| See [enum](#api-enums) section for details.
+|*...*    |`...any`|*[required]*| See the [enum](#enums) section for details.
 
 |Return  |Description
 |:-------|:----------
@@ -238,7 +240,9 @@ Cancel()
 
 `myQuest:Cancel(player:Player)`
 
-Causes the *player* to cancel/fail the current quest.  Triggers the *OnCancel* event listener.  A quest can be re-assigned after being canceled, triggering the *OnAccept* event listener once more.
+Causes the *player* to cancel/fail the current quest.  Triggers the *OnCancel* event listener.
+
+A quest can be re-assigned after being canceled, triggering the *OnAccept* event listener once more.
 
 |Parameter|Type    |Default     |Description
 |--------:|:------:|:----------:|:----------
@@ -261,8 +265,8 @@ Retrieves an objective's progress for a player.
 
 |Return  |Description
 |:-------|:----------
-|`number`| The current progress of the *player* within the objective.
-|`number`| The index of the current objective within the *Questline*.
+|`number`| The current progress of the objective.
+|`number`| The index of the objective within the questline.
 
 ```lua
 local currentProgress, index = myQuest:GetCurrentProgress(player)
@@ -417,8 +421,6 @@ Called only when a call to *Cancel* has been made.  This can be used to fail a q
 |---------:|:------:|:----------
 |*player*  |`Player`| A reference to the player.
 
-**Example usage:**
-
 ```lua
 function myQuest:OnCancel(player)
     -- Run code upon cancelation
@@ -436,8 +438,6 @@ Called when a player has completed a quest.
 |---------:|:------:|:----------
 |*player*  |`Player`| A reference to the player.
 
-**Example usage:**
-
 ```lua
 function myQuest:OnComplete(player)
     -- Run code upon completion
@@ -449,7 +449,9 @@ QuestLine.OnProgress()
 
 `myQuest:OnProgress(player:Player, progress:number, index:number)`
 
-Called when a player has made progress.  For the first time, progress will be zero, and lastly, the progress will be equal to `myQuest:GetObjectiveValue(index)`.
+Called when a player has made progress.  Based on the current objective.
+
+For the first time, progress will be zero, and lastly, the progress will be equal to `myQuest:GetObjectiveValue(index)`.
 
 |Parameter |Type    |Description
 |---------:|:------:|:----------
