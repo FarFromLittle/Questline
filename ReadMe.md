@@ -66,7 +66,7 @@ Each objective has it's own set of parameters.  Refer to the [api](https://farfr
 Registering Players
 -------------------
 
-Players must first register with the system before questlines can be assigned.  A call to [register()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlineregister) requires the *player* and a table containing their progress.
+Players must first register with the system before questlines can be assigned.  A call to [register()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlineregisterplayer) requires the *player* and a table containing their progress.
 
 ``` lua
 QuestLine.registerPlayer(player, playerData)
@@ -95,8 +95,8 @@ If no entry is found in the player's progress table, the [OnAccept()](https://fa
 
 When a player is initially registered, all questlines not found to be complete, or canceled, will automatically be assigned.  This triggers the [OnAssign()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign) callback.
 
-Handling Progression
---------------------
+Tracking Progress
+-----------------
 
 Events are triggered using callbacks related to the various stages of progression.
 
@@ -169,4 +169,3 @@ local playerData = QuestLine.unregisterPlayer(player)
 ```
 
 This returns a simple table containing the player's progress to be saved in a datastore.
-
