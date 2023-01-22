@@ -1,16 +1,18 @@
 Enums
------
+=====
 
-### QuestLine.Event
+QuestLine.Event
+---------------
 
 `string:"event"` `readonly`
 
-Objective triggered by a roblox signal.
+Objective triggered by a Roblox event.
 
 |Parameter|Type             |Default     |Description
 |--------:|:---------------:|:----------:|:----------
 |  *event*|`RBXScriptSignal`|*[required]*| A roblox signal.
 |  *count*|`number`         |1           | Expected trigger count.
+|*compare*|`function`       |*see below* | A custom compare function.
 
 ```lua
 -- Knock on wood
@@ -18,7 +20,22 @@ local trigger = workspace.Wood.ClickDetector.MouseClicked
 myQuest:AddObjective(QuestLine.Event, trigger, 3)
 ```
 
-### QuestLine.Score
+#### Comparision Function
+
+The optional *compare* function receives the player as the first argument, followed by the results of the triggered event, and should return a boolean.
+
+``` lua
+-- Default comparision function
+function compare(plr, arg) return plr == arg end
+```
+
+This is appropiate for events including:
+* The *Triggerd* event of a ProximityPrompt.
+* The *MouseClick* event of a ClickDetector.
+* The *OnServerEvent* of a RemoteEvent.
+
+QuestLine.Score
+---------------
 
 `string:"score"` `readonly`
 
@@ -28,13 +45,15 @@ Objective triggered by a leaderstat value.
 |---------:|:------:|:----------:|:----------
 |*statName*|`string`|*[required]*| The name of the leaderstat to track.
 |*amount*  |`number`|*[required]*| Value to consider complete.
+|*operator*|'string'|">="        | The comparison operator to use.
 
 ```lua
 -- Score 10 points on leaderstats
 myQuest:AddObjective(QuestLine.Score, "Points", 10)
 ```
 
-### QuestLine.Timer
+QuestLine.Timer
+---------------
 
 `string:"timer"` `readonly`
 
@@ -73,10 +92,11 @@ QuestLine.Value
 
 Objective based on an IntValue.
 
-|Parameter|Type      |Default     |Description
-|--------:|:--------:|:----------:|:----------
-| *intVal*|`IntValue`|*[required]*| A reference to an IntValue.
-|  *count*|`number`  |*[required]*| Value to consider complete.
+| Parameter|Type      |Default     |Description
+|---------:|:--------:|:----------:|:----------
+|  *intVal*|`IntValue`|*[required]*| A reference to an IntValue.
+|   *count*|`number`  |*[required]*| Value to consider complete.
+|*operator*|'string'  |">="        | The comparison operator to use.
 
 ```lua
 -- Track kills
@@ -93,8 +113,7 @@ QuestLine.interval
 
 Transition time between one objective and the next.  Measured in seconds.
 
-Because an objective fires *OnProgress* for both zero and 100%,
-this provides a chance to update the player's gui before assigned the next objective.
+Because an objective fires *OnProgress* for both zero and 100%, this provides a chance to update the player's gui before assigned the next objective.
 
 QuestLine.new()
 ---------------
