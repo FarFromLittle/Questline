@@ -1,10 +1,9 @@
 Enums
-=====
+-----
 
-QuestLine.Event
----------------
+### QuestLine.Event
 
-`readonly` `string:"event"`
+`string:"event"` `readonly`
 
 Objective triggered by a roblox signal.
 
@@ -19,10 +18,9 @@ local trigger = workspace.Wood.ClickDetector.MouseClicked
 myQuest:AddObjective(QuestLine.Event, trigger, 3)
 ```
 
-QuestLine.Score
----------------
+### QuestLine.Score
 
-`readonly` `string:"score"`
+`string:"score"` `readonly`
 
 Objective triggered by a leaderstat value.
 
@@ -36,10 +34,9 @@ Objective triggered by a leaderstat value.
 myQuest:AddObjective(QuestLine.Score, "Points", 10)
 ```
 
-QuestLine.Timer
----------------
+### QuestLine.Timer
 
-`readonly` `string:"timer"`
+`string:"timer"` `readonly`
 
 A time based objective.
 
@@ -56,7 +53,7 @@ myQuest:AddObjective(QuestLine.Timer, 5, 5)
 QuestLine.Touch
 ---------------
 
-`readonly` `string:"touch"`
+`string:"touch"` `readonly`
 
 Objective based on a touch event.
 
@@ -72,7 +69,7 @@ myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
 QuestLine.Value
 ---------------
 
-`readonly` `string:"value"`
+`string:"value"` `readonly`
 
 Objective based on an IntValue.
 
@@ -92,7 +89,7 @@ Static Members
 QuestLine.interval
 ------------------
 
-`number` `default=1.0`
+`number = 1.0`
 
 Transition time between one objective and the next.  Measured in seconds.
 
@@ -138,10 +135,10 @@ Returns a quest created with the given *questId*.
 local myQuest = QuestLine.getQuestById("myQuestId")
 ```
 
-QuestLine.register()
+QuestLine.registerPlayer()
 --------------------
 
-`QuestLine.register(player:Player, playerData:{[string]:number})`
+`QuestLine.registerPlayer(player:Player, playerData:{[string]:number})`
 
 Registers a player with the quest system and loads the player's progress.
 
@@ -156,13 +153,13 @@ local playerData = {
     myQuestId = 0 -- Assign zero to auto-accept
 }
 
-QuestLine.register(player, playerData)
+QuestLine.registerPlayer(player, playerData)
 ```
 
-QuestLine.unregister()
+QuestLine.unregisterPlayer()
 ----------------------
 
-`QuestLine.unregister(player:Player):{[string]:number}`
+`QuestLine.unregisterPlayer(player:Player):{[string]:number}`
 
 Unregisters the player from the quest system and returns the player's progress.
 
@@ -176,7 +173,7 @@ Unregisters the player from the quest system and returns the player's progress.
 
 ```lua
 -- save the returned data to datastore
-local playerData = QuestLine.unregister(player)
+local playerData = QuestLine.unregisterPlayer(player)
 ```
 
 Public Methods
