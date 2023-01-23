@@ -155,7 +155,7 @@ QuestLine.getQuestById()
 
 Returns a quest created with the given *questId*.
 
-Useful for accessed questlines between scripts.
+Useful for accessing questlines between scripts.
 
 |Parameter|Type    |Default     |Description
 |--------:|:------:|:----------:|:----------
@@ -172,7 +172,7 @@ local myQuest = QuestLine.getQuestById("myQuestId")
 QuestLine.registerPlayer()
 --------------------
 
-`QuestLine.registerPlayer(player:Player, playerData:{[string]:number})`
+`QuestLine.registerPlayer(player:Player, playerData:{})`
 
 Registers a player with the quest system and loads the player's progress.
 
@@ -195,7 +195,7 @@ QuestLine.registerPlayer(player, playerData)
 QuestLine.unregisterPlayer()
 ----------------------
 
-`QuestLine.unregisterPlayer(player:Player):{[string]:number}`
+`QuestLine.unregisterPlayer(player:Player):{}`
 
 Unregisters the player from the quest system and returns the player's progress.
 
@@ -220,7 +220,7 @@ Public Methods
 AddObjective()
 --------------
 
-`myQuest:AddObjective(objType:string, ...any):number`
+`self:AddObjective(objType:string, ...any):number`
 
 Adds a new objective according to the given objective type.  Additional parameters are determined by the type of objective you wish to add.
 
@@ -242,7 +242,7 @@ local index = myQuest:AddObjective(QuestLine.Touch, workspace.TouchPart)
 Assign()
 --------
 
-`myQuest:Assign(player:Player)`
+`self:Assign(player:Player)`
 
 Assigns a *player* to a questline.
 
@@ -261,7 +261,7 @@ myQuest:Assign(player)
 Cancel()
 --------
 
-`myQuest:Cancel(player:Player)`
+`self:Cancel(player:Player)`
 
 Causes the *player* to cancel/fail the current questline.  Triggers the *OnCancel* event listener.
 
@@ -278,7 +278,7 @@ myQuest:Cancel(player)
 GetCurrentProgress()
 --------------------
 
-`myQuest:GetCurrentProgress(player:Player):(number, number)`
+`self:GetCurrentProgress(player:Player):(number, number)`
 
 Retrieves an objective's progress for a player.  This method returns two numbers.
 
@@ -302,7 +302,7 @@ local currentProgress, index = myQuest:GetCurrentProgress(player)
 GetObjectiveValue()
 -------------------
 
-`myQuest:GetObjectiveValue(index:number):number`
+`self:GetObjectiveValue(index:number):number`
 
 Retrieves an objective's total value.  This depends on the objective being indexed.
 
@@ -330,7 +330,7 @@ local value = myQuest:GetObjectiveValue(index)
 GetProgress()
 -------------
 
-`myQuest:GetProgress(player:Player):number`
+`self:GetProgress(player:Player):number`
 
 Retrieves a player's progress for the questline.  This correlates to the value stored in the player's progress table.
 
@@ -349,7 +349,7 @@ local progress = myQuest:GetProgress(player)
 IsAccepted()
 ------------
 
-`myQuest:IsAccepted(player:Player):boolean`
+`self:IsAccepted(player:Player):boolean`
 
 Checks if the quest is accepted by the player.  A quest is only accepted after being assigned, or after it has been canceled.
 
@@ -370,7 +370,7 @@ end
 IsCanceled()
 ------------
 
-`myQuest:IsCanceled(player:Player):boolean`
+`self:IsCanceled(player:Player):boolean`
 
 Checks if the quest is canceled for the player.
 
@@ -393,7 +393,7 @@ end
 IsComplete()
 ------------
 
-`myQuest:IsComplete(player:Player):boolean`
+`self:IsComplete(player:Player):boolean`
 
 Checks if the *player* has completed the quest.
 
@@ -417,7 +417,7 @@ Events
 QuestLine.OnAccept()
 --------------------
 
-`myQuest:OnAccept(player:Player)`
+`QuestLine:OnAccept(player:Player)`
 
 Called at the beginning of a quest and only when it's first initialized.  This can be used to give a player starter items specific to the quest.
 
@@ -426,7 +426,7 @@ Called at the beginning of a quest and only when it's first initialized.  This c
 |*player*  |`Player`| A reference to the player.
 
 ``` lua
-function myQuest:OnAccept(player)
+function QuestLine:OnAccept(player)
     -- Give player a quest item
 end
 ```
@@ -434,7 +434,7 @@ end
 QuestLine.OnAssign()
 --------------------
 
-`myQuest:OnAssign(player:Player)`
+`QuestLine:OnAssign(player:Player)`
 
 Called each time the player is assigned the questline.  This runs after it is accepted, or when a player reloads from a previous session.
 
@@ -445,7 +445,7 @@ Useful for creating gui elements needed to display a questlog.
 |*player*  |`Player`| A reference to the player.
 
 ``` lua
-function myQuest:OnAssign(player)
+function QuestLine:OnAssign(player)
     -- Run code upon assignment
 end
 ```
@@ -453,7 +453,7 @@ end
 QuestLine.OnCancel()
 --------------------
 
-`myQuest:OnCancel(player:Player)`
+`QuestLine:OnCancel(player:Player)`
 
 Called only when a call to *Cancel()* has been made.  This can be used to fail a quest.
 
@@ -464,7 +464,7 @@ A failed questline is recorded in the player's progress table as a negetive numb
 |*player*  |`Player`| A reference to the player.
 
 ``` lua
-function myQuest:OnCancel(player)
+function QuestLine:OnCancel(player)
     -- Run code upon cancelation
 end
 ```
@@ -472,7 +472,7 @@ end
 QuestLine.OnComplete()
 ----------------------
 
-`myQuest:OnComplete(player:Player)`
+`QuestLine:OnComplete(player:Player)`
 
 Called when a player has completed a questline.
 
@@ -483,7 +483,7 @@ The value recorded in the player's progress table will be `>=` the questline's t
 |*player*  |`Player`| A reference to the player.
 
 ```lua
-function myQuest:OnComplete(player)
+function QuestLine:OnComplete(player)
     -- Run code upon completion
 end
 ```
@@ -491,7 +491,7 @@ end
 QuestLine.OnProgress()
 ----------------------
 
-`myQuest:OnProgress(player:Player, progress:number, index:number)`
+`QuestLine:OnProgress(player:Player, progress:number, index:number)`
 
 Called when a player has made progress.  Based on the current objective.
 
@@ -504,7 +504,7 @@ For the first time, progress will be zero, and lastly, the progress will be equa
 |*index*   |`number`| The objective's index within the quest.
 
 ```lua
-function myQuest:OnProgress(player, progress, index)
+function QuestLine:OnProgress(player, progress, index)
     print(player.Name, "has progressed to", progress, "for objective", index)
 end
 ```
