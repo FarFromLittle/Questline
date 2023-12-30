@@ -68,7 +68,7 @@ function Objective.event(event:RBXScriptSignal, count:number?, compare:(plr:Play
 	
 	local function eval(player:Player, progress:number)
 		for i = 1, count - progress do
-			repeat until comp(player, coroutine.yield(progress, event))
+			repeat until compare(player, coroutine.yield(progress, event))
 			progress += 1
 		end
 		
