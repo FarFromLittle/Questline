@@ -1,147 +1,142 @@
-<img src="https://raw.githubusercontent.com/FarFromLittle/QuestLine/main/docs/QuestLineBanner.png" alt="QuestLine" />
+<div align="center">
 
-QuestLine is a server-sided module script that aids in the creation, assignment, and tracking of quests.
+# Quest<i>line</i>
 
-The module itself does not include data storage or visual elements.
+[View Source](https://github.com/FarFromLittle/QuestLine/blob/main/QuestLine.lua)
 
-Instead, it offers a framework to create customized quest systems that are event-driven and easily maintained.
+</div>
 
-It has no dependencies, and need only be required on the server.
+Questline is a server-sided module script that aids in the creation and tracking of quests wtihin your game.  It offers a framework to create customized questlines that are event-driven and easily maintained.
 
-``` lua
-local QuestLine = require(game.ServerStorage.QuestLine)
-```
-
-Creating QuestLines
--------------------
-
-QuestLines are created with a call to *new*.  This requires a unique string used to store the questline within the system.
+It has no dependencies, and need only be required from a server script.
 
 ``` lua
-local myQuest = QuestLine.new("myQuestId", { Title = "My First Quest", ... })
+local Questline = require(game.ServerStorage.Questline)
 ```
 
-The optional second parameter allows you to specify a table for *self*.  This is useful to store information to access within the event handlers.
+## Creating Questlines
 
-After a questline is created, it can later be retrieved with a call to [getQuestById()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlinegetquestbyid).
+Questlines are created with a call to `new()`.  This requires a unique string used to store the questline within the system.
 
 ``` lua
-local myQuest = QuestLine.getQuestById("myQuestId")
+local myQuest = Questline.new("myQuestId")
 ```
 
-Adding Objectives
------------------
-
-A questline consists of one or more objectives.  Progress moves from one objective to the next until it's complete.
-
-[AddObjective()](https://farfromlittle.github.io/QuestLine/api.html#public-methods-addobjective) first requires one of the objective types.  The rest of the parameters are dependant on the type of objective being added.
+After a questline is created, it can later be retrieved with a call to `getQuestById()`.
 
 ``` lua
-myQuest:AddObjective(objType, ...any)
+local myQuest = Questline.getQuestById("myQuestId")
 ```
 
-There are a total five objective types.
+## Adding Objectives
 
-| Type | Description
-|-----:|:-----------
-|[Event](https://farfromlittle.github.io/QuestLine/api.html#enums-questlineevent) | A generic, event-based objective.
-|[Score](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinescore) | An objective based on the value of a leaderstat.
-|[Timer](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinetimer) | A time-based objective.
-|[Touch](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinetouch) | A touch-based objective.
-|[Value](https://farfromlittle.github.io/QuestLine/api.html#enums-questlinevalue) | An objective based on the value of a given *IntValue*.
+A questline consists of one or more objectives.  Progress moves from one objective to the next until it is complete.
+
+Objectives are accessable from `Questline.Objective`.  It may be useful to store the object in a local variable.
 
 ``` lua
--- Examples:
-
--- Reach level 10 on leaderstats
-myQuest:AddObjective(QuestLine.Score, "Level", 10)
-
--- Wait 360 seconds (one hour), count by minutes
-myQuest:AddObjective(QuestLine.Timer, 360, 60)
-
--- Wait for player to touch a given part
-myQuest:AddObjective(QuestLine.Touch, workspace.DropOff)
+local Objective = Questline.Objective
 ```
 
-Each objective has it's own set of parameters.  Refer to the [api](https://farfromlittle.github.io/QuestLine/api.html#enums) for a detailed explanation of each objective type.
-
-Registering Players
--------------------
-
-Players must first register with the system before questlines can be assigned.  A call to [registerPlayer()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlineregisterplayer) requires the *player* and a table containing their progress.
+Making the creation of objectives easier to read.
 
 ``` lua
-QuestLine.registerPlayer(player, playerData)
+local touchBase = Objective.touch(workspace.Baseplate)
 ```
 
-Player progression is stored in a table under the key supplied by *questId*.  The value is stored as a integer.
-
-Additionally, this table can be pre-populated with starter quests by assigning zero to an entry.
+It can now be added to the questline.
 
 ``` lua
-local playerData = {
-	myQuestId = 0 -- assign zero to auto-accept
-}
+myQuest:AddObjective(touchBase)
+```
+Or add it directly.
+``` lua
+myQuest:AddObjective(Objective.touch(workspace.Baseplate))
 ```
 
-Assigning QuestLines
---------------------
+The `Objective` property of `Questline` contains several objective types to add to your questline.
 
-Once a player is registered, they are ready to be assigned quests.
+| Objective Type | Description
+|-:|:-
+| `event(event, filter)` | Generic, event-based objective.
+| `score(statName, targetValue)` | Leaderstat objective.
+| `timer(duration)` | Timed objective.  Measured in seconds.
+| `touch(touchPart)` | Touch-based objective.
+| `value(intValue, targetValue)` | Based on the `Value` of an *IntValue*.
+
+Combinations can also be made, adding variety to your questlines.
+
+| Combination Type | Description
+|-:|:-
+| `all(...)` | Requires all objectives be complete.
+| `any(...)` | Only one required to be complete.
+| `none(...)` | Completed when all objectives are canceled.
+
+## Assigning Questlines
+
+Players must be registered with the system in order to track progress across sessions.
+
+This should be done when a player joins the game.
+
+``` lua
+game.Players.PlayerAdded:Connect(function (player)
+	QuestLine.registerPlayer(player)
+end)
+```
+
+When a player is registered, previously incomplete questlines  will automatically be re-assigned.
+
+The optional second parameter is used as the player's progression table.  This allows you to auto-assign starter quests.
+
+``` lua
+QuestLine.registerPlayer(player, {
+	StarterQuest = 0
+})
+```
+
+The _key_ in the table coincides with the `questId`, while the _value_ contains the index of the last objective complete.
+
+Once a player is registered, they are ready to be assigned a questline.
 
 ``` lua
 myQuest:Assign(player)
 ```
 
-If no entry is found in the player's progress table, the [OnAccept()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonaccept) callback will fire and `myQuestId = 0` will be added.  Afterwards, the [OnAssign()](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign) callback is triggered.
+## Tracking Progress
 
-When a player is initially registered, all questlines not found to be complete, or canceled, will automatically be assigned.
+Each objective has a variety of methods to attach custom behavior.  The following table describes each method.
 
-Tracking Progress
------------------
-
-Events are triggered using callbacks related to the various stages of progress.
-
-Events are fired in the following order:
-
-* [OnAccept(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonaccept)
-
-* [OnAssign(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonassign)
-  
-* [OnProgress(player:Player, progress:number, index:number)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineonprogress)
-
-* [OnComplete(player:Player)](https://farfromlittle.github.io/QuestLine/api.html#events-questlineoncomplete)
-
-A typical questline is managed by a global callback function.
-
-``` lua
-function QuestLine:OnComplete(player)
-    print(player, "completed", self)
-end
-```
-
-Callbacks can be defined on individual questlines, but you may need to make a call to the global one as well.
-
-The global callback will not run when one is defined on the questline.  This makes it necessary to do it manually.
+| Callback | Description
+|-:|:-
+| `OnAssign(player)` | Triggered anytime the player is assigned the objective.
+| `OnCancel(player)` | Triggered when an objective is canceled/failed.
+| `OnComplete(player)` | Player has completed all requirements for the objective.
 
 ``` lua
 function myQuest:OnComplete(player)
-    QuestLine.OnComplete(self, player)
-    -- Run myQuest code
+	print("Yay!,", player.Name)
 end
 ```
 
-Be aware that you can only set a callback once per context.  Setting it again will overwrite the previous behavior.
+These methods can be safely overridden for any objective; including questlines.
 
-Saving Player Data
-------------------
+
+## Saving Player Data
 
 When a player leaves the game, they need to be unregistered from the system.
 
 ``` lua
-local playerData = QuestLine.unregisterPlayer(player)
+game.Players.PlayerRemoving:Connect(function (player)
+	QuestLine.unregisterPlayer(player)
+end
 ```
 
-This returns a simple table containing the player's progress to be saved in a datastore.
+This saves player progress for each questline they have been assigned.
 
-When a player rejoins, pass this back to [registerPlayer()](https://farfromlittle.github.io/QuestLine/api.html#static-members-questlineregisterplayer) to continue progress.
+When a player is registered in a new session, progress will automatically be loaded from the datastore.
+
+## In Conclusion
+
+This module is intended for advanced developers, and requires a good understanding of lua scripting.
+
+As always, feel free to post your questions, creations, and feedback below.
