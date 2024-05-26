@@ -52,20 +52,10 @@ myQuest:AddObjective(Objective.touch(workspace.Baseplate))
 
 The `Objective` property of `Questline` contains several objective types to add to your questline.
 
-#### `Objective.event()`
-
-A generic, event-based objective.
-
-| Parameter | Type | Description
-|-|-|-
-|`event`| string | Reference to a roblox event.
-|`filter`| function | Controls whether the event counts for the player.
-
-The `event` parameter can be any Roblox event signal.  Some common examples are _ClickDetector.MouseClick_ and 
-
 | Objective Type | Description
 |:-|:-
 | `event(event, filter)` | Generic, event-based objective.
+| `score(statName, targetValue)` | Tracks the `Value` of a _leaderstat_.
 | `timer(duration)` | Timed objective.  Measured in seconds.
 | `touch(touchPart)` | Touch-based objective.
 | `value(intValue, targetValue)` | Based on the `Value` of an *IntValue*.
@@ -76,7 +66,7 @@ Combinations can also be made, adding variety to your questlines.
 |-:|:-
 | `all(...)` | Requires all objectives be complete.
 | `any(...)` | Only one required to be complete.
-| `none(...)` | Completed when all objectives are canceled.
+| `none(...)` | Completion of an objective causes failure.
 
 ## Assigning Questlines
 
