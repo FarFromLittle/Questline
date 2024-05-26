@@ -1,5 +1,3 @@
-local DataStore = game:GetService("DataStoreService")
-
 local Objective = require(script.Objective)
 
 local Questline = { __index = {} }
@@ -7,12 +5,10 @@ local Questline = { __index = {} }
 local prototype = setmetatable(Questline.__index, Objective)
 local super = Objective.__index
 
-local canSave = {}
 local dataStore = {}
---local playerProgress = {}
 local questTable = {}
 
-local ATTEMPT_COUNT = 3
+local ATTEMPT_COUNT = 1
 local ATTEMPT_DELAY = 3
 
 Questline.Objective = Objective
@@ -36,12 +32,26 @@ local function attempt(...)
 	return ok, res
 end
 
+local function loadPlayerData(ds, player, data)
+	local ok, pages = attempt(ds.GetSortedAsync, ds, false, 100)
+	
+	if not ok then return data end
+	
+	repeat
+		for _, entry in pages:GetCurrentPage() do
+			data[entry.key] = entry.value
+		end
+	until pages.IsFinished or not attempt(pages.AdvanceToNextPageAsync, pages)
+	
+	return data
+end
+
 local function saveStat(player, name, value)
 	local ds = dataStore[player]
 	
 	if not ds then return end
 	
-	attempt(ds.SetAsync, ds, name, value)
+	task.spawn(attempt, ds.SetAsync, ds, name, value)
 end
 
 local function loadStat(player, name)
@@ -65,11 +75,9 @@ end
 local function objectiveComplete(objective, player)
 	local self = objective.Parent
 	
-	local progress = playerData[player][self.QuestId] + 1
+	local progress = objective.Index
 	
 	super.Complete(objective, player)
-	
-	playerData[player][self.QuestId] = progress
 	
 	saveStat(player, self.QuestId, progress)
 	
@@ -84,51 +92,32 @@ function Questline.getQuestById(questId)
 	return questTable[questId]
 end
 
-local function loadPlayerData(ds, player, data)
-	local ok, pages = attempt(ds.GetSortedAsync, ds, false, 100)
+function Questline.register(player, questData)
+	local ok, ds = attempt(game.DataStoreService.GetOrderedDataStore, game.DataStoreService, player.UserId, "Questline")
 	
-	if not ok then return data end
-	
-	repeat
-		for _, entry in pages:GetCurrentPage() do
-			data[entry.key] = entry.value
-		end
-	until pages.IsFinished or not attempt(pages.AdvanceToNextPageAsync, pages)
-	
-	return data
-end
-
-function Questline.register(player, saveData)
-	local ok, ds = attempt(DataStore.GetOrderedDataStore, DataStore, player.UserId, "Questline")
+	if not questData then questData = {} end
 	
 	if ok then
 		dataStore[player] = ds
-		saveData = loadPlayerData(ds, player, saveData or {})
-	else
-		
+		loadPlayerData(ds, player, questData)
 	end
-	
-	
-	
 	
 	local playerstats = Instance.new("Folder")
 	playerstats.Name = "playerstats"
 	
-	for key, val in saveData do
-		local stat = questTable[key]
+	for questId, progress in questData do
+		local quest = questTable[questId]
 		
-		if not stat then
-			stat = Instance.new("IntValue")
-			
-			stat.Name = key
-			stat.Value = val
+		if not quest then
+			local stat = Instance.new("IntValue")
+			stat.Name = questId
+			stat.Value = progress
 			stat.Parent = playerstats
-			
 			continue
 		end
 		
-		if 0 <= val and val <= #stat.Objectives then
-			stat:Assign(player, val)
+		if 0 <= val and val <= #quest.Objectives then
+			quest:Assign(player, val)
 		end
 	end
 	
@@ -136,36 +125,19 @@ function Questline.register(player, saveData)
 end
 
 function Questline.unregister(player)
-	local saveData = playerData[player]
-	
-	if not saveData then return end
-	
-	for questId, progress in saveData do
-		local quest = questTable[questId]
-		
-		if quest and quest.Connected[player] then
-			quest:Disconnect(player)
-		end
+	local ds = dataStore[player]
+
+	if not ds then return end
+
+	dataStore[player] = nil
+
+	local leaderstats = player:FindFirstChild("leaderstats")
+
+	if not leaderstats then return end
+
+	for _, child in leaderstats:GetChildren() do
+		task.spawn(attempt, ds.SetAsync, ds, child.Name, child.Value)
 	end
-	
-	playerData[player] = nil
-	
-	if canSave[player] then canSave[player] = nil
-	else return end
-	
-	for name, value in saveData do
-		saveStat(player.UserId, name, value)
-	end
-	
-	local dataStore = DataStore:GetOrderedDataStore(player.UserId, "Questline")
-	
-	local ok, res
-	local attempt = 0
-	
-	for questId, progress in saveData do repeat
-		attempt += 1
-		ok, res = pcall(dataStore.SetAsync, dataStore, questId, progress)
-	until ok or 3 <= attempt or not task.wait(2) end
 end
 
 function Questline.new(questId)

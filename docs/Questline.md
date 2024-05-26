@@ -1,6 +1,8 @@
 # Questline
 
-This serves as a base class for all objectives within the system.
+Questline is a server-sided module script that aids in the creation and tracking of quests wtihin your game.  It offers a framework to create customized questlines that are event-driven and easily maintained.
+
+This module is intended for advanced developers, and requires a good understanding of lua scripting.
 
 ## Summary
 
