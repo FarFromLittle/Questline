@@ -109,8 +109,8 @@ function Questline.register(player, questData)
 			continue
 		end
 		
-		if 0 <= val and val <= #quest.Objectives then
-			quest:Assign(player, val)
+		if 0 <= progress and progress <= #quest.Objectives then
+			quest:Assign(player, progress)
 		end
 	end
 	
