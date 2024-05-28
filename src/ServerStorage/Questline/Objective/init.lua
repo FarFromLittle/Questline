@@ -45,13 +45,13 @@ function prototype:Disconnect(player)
 	
 	if not connected then return end
 	
+	self.Connected[player] = nil
+	
 	for _, conn in connected do
 		if conn.Connected then
 			conn:Disconnect()
 		end
 	end
-	
-	self.Connected[player] = nil
 end
 
 function prototype:IsConnected(player)

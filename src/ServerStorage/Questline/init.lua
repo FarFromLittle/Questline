@@ -6,53 +6,62 @@ local prototype = setmetatable(Questline.__index, Objective)
 local super = Objective.__index
 
 local dataStore = {}
-local playerData = {}
+local questData = {}
 local questTable = {}
-
-local ATTEMPT_COUNT = 1
-local ATTEMPT_DELAY = 3
 
 Questline.Objective = Objective
 
-local function attempt(...)
-	local cnt = 0
+local function attempt(times, ...)
 	local ok, res
 	
 	while true do
 		ok, res = pcall(...)
 		
-		cnt += 1
+		times -= 1
 		
-		if ok or ATTEMPT_COUNT <= cnt then
+		if ok or times <= 0 then
 			break
 		end
 		
-		task.wait(ATTEMPT_DELAY)
+		task.wait(3)
 	end
-	
+
 	return ok, res
 end
 
-local function loadPlayerData(ds, player, data)
-	local ok, pages = attempt(ds.GetSortedAsync, ds, false, 100)
+local function loadPlayerData(player, playerData)
+	local ok, ds = attempt(1, game.DataStoreService.GetOrderedDataStore, game.DataStoreService, player.UserId, "Questline")
 	
-	if not ok then return data end
+	if ok then dataStore[player] = ds
+	else return end
+
+	local ok, pages = attempt(3, ds.GetSortedAsync, ds, false, 100)
 	
+	if not ok then return end
+	
+	print("Loading player data...")
+
 	repeat
-		for _, entry in pages:GetCurrentPage() do
-			data[entry.key] = entry.value
+		for _, data in pages:GetCurrentPage() do
+			playerData[data.key] = data.value
 		end
-	until pages.IsFinished or not attempt(pages.AdvanceToNextPageAsync, pages)
-	
-	return data
+	until pages.IsFinished or not attempt(3, pages.AdvanceToNextPageAsync, pages)
+
+	print("Player data loaded.")
+
+	return playerData
 end
 
-local function saveStat(player, name, value)
+local function saveData(player, name, value)
+	if value == questData[player][name] then return end
+
+	questData[player][name] = value
+
 	local ds = dataStore[player]
-	
+
 	if not ds then return end
-	
-	task.spawn(attempt, ds.SetAsync, ds, name, value)
+
+	attempt(5, ds.SetAsync, ds, name, value)
 end
 
 local function objectiveCanceled(objective, player)
@@ -65,16 +74,17 @@ end
 
 local function objectiveComplete(objective, player)
 	local self = objective.Parent
+	local progress = questData[player] and questData[player][self.QuestId] + 1
+
+	if progress ~= objective.Index then return end
 	
-	local progress = objective.Index
+	saveData(player, self.QuestId, progress)
 	
 	super.Complete(objective, player)
-	
-	saveStat(player, self.QuestId, progress)
 
-	self.Progress[player] = progress
+	self:OnProgress(player, progress)
 	
-	if #self.Objectives <= progress then
+	if self.ObjectiveCount <= progress then
 		self:Complete(player)
 	else
 		self.Objectives[progress + 1]:Assign(player)
@@ -85,36 +95,22 @@ function Questline.getQuestById(questId)
 	return questTable[questId]
 end
 
-function Questline.register(player, questData)
-	local ok, ds = attempt(game.DataStoreService.GetOrderedDataStore, game.DataStoreService, player.UserId, "Questline")
+function Questline.register(player, playerData)
+	if not playerData then playerData = {} end
+
+	loadPlayerData(player, playerData)
 	
-	if not questData then questData = {} end
+	questData[player] = playerData
 	
-	if ok then
-		dataStore[player] = ds
-		loadPlayerData(ds, player, questData)
-	end
-	
-	local playerstats = Instance.new("Folder")
-	playerstats.Name = "playerstats"
-	
-	for questId, progress in questData do
+	for questId, progress in playerData do
 		local quest = questTable[questId]
-		
-		if not quest then
-			local stat = Instance.new("IntValue")
-			stat.Name = questId
-			stat.Value = progress
-			stat.Parent = playerstats
-			continue
-		end
-		
-		if 0 <= progress and progress <= #quest.Objectives then
+
+		if not quest then continue end
+
+		if 0 <= progress and progress < quest.ObjectiveCount then
 			quest:Assign(player, progress)
 		end
 	end
-	
-	playerstats.Parent = player
 end
 
 function Questline.unregister(player)
@@ -123,57 +119,48 @@ function Questline.unregister(player)
 	if not ds then return end
 
 	dataStore[player] = nil
-
-	local leaderstats = player:FindFirstChild("leaderstats")
-
-	if not leaderstats then return end
-
-	for _, child in leaderstats:GetChildren() do
-		task.spawn(attempt, ds.SetAsync, ds, child.Name, child.Value)
-	end
+	questData[player] = nil
 end
 
 function Questline.new(questId)
-	local self = Objective.new(Questline, {
+	local self = setmetatable({
+		QuestId = questId,
 		Objectives = {},
-		Progress = {},
-		QuestId = questId
-	})
+		ObjectiveCount = 0
+	}, Questline)
 	
 	questTable[questId] = self
 	
 	return self
 end
 
-function prototype:AddObjective(objType, ...)
-	local obj
-	
-	if type(objType) == "string" then
-		obj = Objective[objType](...)
-	else
-		obj = objType
-	end
-	
+function prototype:AddObjective(obj)
+	local index = self.ObjectiveCount + 1
+
+	obj.Index = index
+	obj.Parent = self
+
 	obj.Cancel = objectiveCanceled
 	obj.Complete = objectiveComplete
-	obj.Index = #self.Objectives + 1
-	obj.Parent = self
-	
-	self.Objectives[obj.Index] = obj
+
+	table.freeze(obj)
+
+	self.Objectives[index] = obj
+	self.ObjectiveCount = index
 	
 	return obj
 end
 
 function prototype:Assign(player, progress)
-	super.Assign(self, player)
-	
-	if not progress then
-		progress = 0
-	end
+	if not progress then progress = 0 end
 
-	self.Progress[player] = progress
+	self:Disconnect(player)
 	
-	if #self.Objectives <= progress then
+	saveData(player, self.QuestId, progress)
+
+	self:OnAssign(player)
+	
+	if self.ObjectiveCount <= progress then
 		self:Complete(player)
 	else
 		self.Objectives[progress + 1]:Assign(player)
@@ -181,27 +168,35 @@ function prototype:Assign(player, progress)
 end
 
 function prototype:Disconnect(player)
-	local connected = self.Connected[player]
-	
-	if not connected then return end
-	
-	super.Disconnect(self, player)
-	
-	local progress = self.Progress[player]
-
-	if not progress then return end
-
-	local currentObjective = self.Objectives[progress + 1]
+	local currentObjective = self.Objectives[self:GetProgress(player) + 1]
 
 	if currentObjective then
 		currentObjective:Disconnect(player)
 	end
+end
 
-	self.Progress[player] = nil
+function prototype:GetProgress(player)
+	local progress = questData[player] and questData[player][self.QuestId]
+	if not progress then return 0 end
+	if progress < 0 then return -(progress + 1) end
+	return progress
 end
 
 function prototype:IsComplete(player)
-	return self.Progress[player] and #self.Objectives <= self.Progress[player] or false
+	local progress = questData[player] and questData[player][self.QuestId]
+	return progress and self.ObjectiveCount <= progress or false
 end
+
+function prototype:IsConnected(player)
+	local progress = questData[player] and questData[player][self.QuestId]
+	return progress and 0 <= progress and progress < self.ObjectiveCount or false
+end
+
+function prototype:IsCanceled(player)
+	local progress = questData[player] and questData[player][self.QuestId]
+	return progress and progress < 0 or false
+end
+
+function prototype:OnProgress(player, progress) end
 
 return Questline

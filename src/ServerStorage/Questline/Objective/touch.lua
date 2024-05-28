@@ -5,17 +5,30 @@ local Touch = { __index = {} }
 local prototype = setmetatable(Touch.__index, Objective)
 local super = Objective.__index
 
-function Touch.new(_, touchPart)
+function Touch.new(_, touchPart, touchTarget, touchCount)
 	local self = Objective.new(Touch, {
 		TouchPart = touchPart
 	})
+
+	if touchTarget then
+		self.TouchTarget = touchTarget
+		self.TouchCount = touchCount or 1
+	end
 	
 	return self
 end
 
 function prototype:Assign(player)
+	local target = self.TouchTarget
+
 	local function touched(otherPart)
-		if otherPart.Parent == player.Character then
+		if target then
+			if otherPart:HasTag(target) then
+				self:Complete(player)
+
+				return true
+			end
+		elseif otherPart.Parent == player.Character then
 			self:Complete(player)
 			
 			return true
