@@ -1,138 +1,143 @@
-# Basic Usage
+<div align="center">
 
-Questline is a server-sided module script that aids in the creation and tracking of quests wtihin your game.  It offers a framework to create customized questlines that are event-driven and easily maintained.
+# [![banner|690x215](../images/banner.png)](https://github.com/FarFromLittle/QuestLine)
 
-It has no dependencies, and need only be required from a server script.
+[[ Demo ]](https://www.roblox.com/games/11817280372/Qtest) [[ Docs ]](https://github.com/FarFromLittle/Questline/tree/main/docs) [[ Source ]](https://github.com/FarFromLittle/Questline/tree/main/src)
 
-``` lua
+</div>
+
+> **Please notice:** Quest<i>line</i> is intended for advanced developers, and __requires__ a decent understanding of the Roblox scripting language.
+
+Quest<i>line</i> is a server-sided Roblox module that aids in the creation and tracking of Quest<i>lines</i>.
+
+Typically, a Quest<i>line</i> is a sequence of objectives the player must accomplish to acheive a goal.
+
+This guide aims to be a quick explaination on how to use Quest<i>line</i>.
+
+## 🚀 Getting Started
+
+Quest<i>line</i> __requires__ a _questId_ to represent each Quest<i>line</i> within the system.
+
+```lua
 local Questline = require(game.ServerStorage.Questline)
+
+local myQuest = Questline.new("MyQuest")
 ```
 
-## Creating Questlines
+You can then retrieve a previously created Quest<i>line</i>.
 
-Questlines are created with a call to `new()`.  This requires a unique string used to store the questline within the system.
-
-``` lua
-local myQuest = Questline.new("myQuestId")
+```lua
+local myQuest = Questline.getQuestById("MyQuest")
 ```
 
-After a questline is created, it can later be retrieved with a call to `getQuestById()`.
+## ✅ Adding Objectives
 
-``` lua
-local myQuest = Questline.getQuestById("myQuestId")
-```
+ The `Objective` property of Quest<i>line</i> hosts the various objective types.
 
-## Adding Objectives
-
-A questline consists of one or more objectives.  Progress moves from one objective to the next until it is complete.
-
-Objectives are accessable from `Questline.Objective`.  It may be useful to store the object in a local variable.
-
-``` lua
+```lua
 local Objective = Questline.Objective
 ```
 
-Making the creation of objectives easier to read.
+An objective requires it's own set of parameters; according to it's function.
 
-``` lua
+```lua
 local touchBase = Objective.touch(workspace.Baseplate)
 ```
 
-It can now be added to the questline.
+Objectives can be grouped together, allowing you to create branching Quest<i>lines</i>.
 
-``` lua
+```lua
+local clickOne = Objective.click(workspace.PartOne)
+local clickTwo = Objective.click(workspace.PartTwo)
+
+local chooseOne = Objective.any(clickOne, clickTwo)
+```
+
+Finally, objectives are added to a Quest<i>line</i>.
+
+```lua
 myQuest:AddObjective(touchBase)
 ```
-Or add it directly.
-``` lua
-myQuest:AddObjective(Objective.touch(workspace.Baseplate))
-```
 
-## Objective Types
+### Objective Types
 
-The `Objective` property of `Questline` contains several objective types to add to your questline.
+Several objective types exist for use in your experience.
 
-| Objective Type | Description
-|:-|:-
-| `event(event, filter)` | Generic, event-based objective.
-| `score(statName, targetValue)` | Tracks the `Value` of a _leaderstat_.
-| `timer(duration)` | Timed objective.  Measured in seconds.
-| `touch(touchPart)` | Touch-based objective.
-| `value(intValue, targetValue)` | Based on the `Value` of an *IntValue*.
+|Objective Type|Params|Description
+|-:|:-|:-
+| `all`|`(...)`| Requires completion of __all__ given objectives.
+| `any`|`(...)`| Requires only __one__ given objective to be complete.
+|`none`|`(...)`| Canceled upon completion of __any__ given objective.
 
-Combinations can also be made, adding variety to your questlines.
+|Objective Type|Params|Description
+|-:|:-|:-
+|`event`|`(event, filter)`        |Generic, event-based objective.
+|`score`|`(statName, targetValue)`|Tracks the value of a _leaderstat_.
+|`timer`|`(duration)`             |Timed objective.  Measured in seconds.
+|`touch`|`(touchPart)`            |Touch-based objective.
+|`value`|`(intValue, targetValue)`|Objective based on a [_playerstat_](https://github.com/FarFromLittle/Questline/blob/main/docs/Playerstats.md).
 
-| Combination Type | Description
-|-:|:-
-| `all(...)` | Requires all objectives be complete.
-| `any(...)` | Only one required to be complete.
-| `none(...)` | Completion of an objective causes failure.
+## 🔔 Attaching Events
 
-## Assigning Questlines
+Quest<i>lines</i> have several events associated with them, allowing developers to attach custom behaviour.
 
-Players must be registered with the system in order to track progress across sessions.
+```lua
+myQuest.OnComplete:Connect(function (player)
+	print("Yay!,", player)
+end)
 
-This should be done when a player joins the game.
-
-``` lua
-game.Players.PlayerAdded:Connect(function (player)
-	QuestLine.registerPlayer(player)
+myQuest.OnCancel:Connect(function (player)
+	print(player, "failed!")
 end)
 ```
 
-When a player is registered, previously incomplete questlines  will automatically be re-assigned.
+### Event Types
 
-The optional second parameter is used as the player's progression table.  This allows you to auto-assign starter quests.
+The following event types are found on a Quest<i>line</i>.
 
-``` lua
-QuestLine.registerPlayer(player, {
-	StarterQuest = 0
-})
+|BindableEvent|Arguments|Description
+|-:|:-:|:-
+|`OnAccept`|`(player)`| Fired when _player_ is assigned a Quest<i>line</i> for the first time.
+|`OnAssign`|`(player)`| Fired when _player_ is assigned, including subsequent sessions.
+|`OnCancel`|`(player)`| Fired with call to `Cancel`; triggered by `Objective.none`.
+|`OnComplete`|`(player)`| Fired when _player_ has completed the Quest<i>line</i>.
+|`OnProgress`|`(player, index)`| Fired when _player_ has completed an objective.
+
+## 🧲 Assigning Players
+
+You __must__ register players to assign Quest<i>lines</i>.  Preferably, when a player first joins an experience.
+
+```lua
+game.Players.PlayerAdded:Connect(function (player)
+	Questline.register(player)
+end)
 ```
 
-The _key_ in the table coincides with the `questId`, while the _value_ contains the index of the last objective complete.
+Quest<i>lines</i> are assigned, for example, when a player touches a part.
 
-Once a player is registered, they are ready to be assigned a questline.
+```lua
+workspace.QuestGiver.Touch:Connect(function (hitPart)
+	local player = game.Players:GetPlayerFromCharacter(hitPart.Parent)
 
-``` lua
-myQuest:Assign(player)
+	if player and not myQuest:IsConnected(player) then
+		myQuest:Assign(player)
+	end
+end)
 ```
 
-## Tracking Progress
+## 💩 Cleaning Up
 
-Each objective has a variety of methods to attach custom behavior.  The following table describes each method.
-
-| Callback | Description
-|-:|:-
-| `OnAssign(player)` | Triggered anytime the player is assigned the objective.
-| `OnCancel(player)` | Triggered when an objective is canceled/failed.
-| `OnComplete(player)` | Player has completed all requirements for the objective.
-
-``` lua
-function myQuest:OnComplete(player)
-	print("Yay!,", player.Name)
-end
-```
-
-These methods can be safely overridden for any objective; including questlines.
-
-
-## Saving Player Data
-
-When a player leaves the game, they need to be unregistered from the system.
+When leaving, the player __must__ unregister.
+This removes _player_ and cleans up any loose connections.
 
 ``` lua
 game.Players.PlayerRemoving:Connect(function (player)
-	QuestLine.unregisterPlayer(player)
+	Questline.unregister(player)
 end
 ```
 
-This saves player progress for each questline they have been assigned.
+And that's it!  Now you can start creating your very own Quest<i>lines</i>.  And remember...
 
-When a player is registered in a new session, progress will automatically be loaded from the datastore.
+### 😎 Keep Cool & Be Kind
 
-## In Conclusion
-
-This module is intended for advanced developers, and requires a good understanding of lua scripting.
-
-As always, feel free to post your questions, creations, and feedback below.
+Quest<i>line</i> is made out of ❤️, not only for games, but for those that create them.  And that's __you__! 

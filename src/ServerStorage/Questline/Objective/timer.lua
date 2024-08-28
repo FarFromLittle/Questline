@@ -1,19 +1,18 @@
 local Objective = require(script.Parent)
 
-local Timer = { __index = {} }
-
-local prototype = setmetatable(Timer.__index, Objective)
+local Timer = { __index = setmetatable({}, Objective) }
+local prototype = Timer.__index
 local super = Objective.__index
 
-function Timer.new(_, duration)
-	local self = Objective.new(Timer, {
-		Duration = duration
-	})
-	
-	return self
+function Timer:__tostring()
+	return `timer({self.Duration})`
 end
 
-function prototype:Assign(player)
+function prototype:new(duration)
+	self.Duration = duration
+end
+
+function prototype:Assign(player, parent)
 	super.Assign(self, player)
 	
 	task.delay(self.Duration, self.Complete, self, player)

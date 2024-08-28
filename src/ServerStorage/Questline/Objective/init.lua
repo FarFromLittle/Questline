@@ -1,67 +1,179 @@
-local Objective = setmetatable({ __index = {} }, {
-	__index = function (self, name)
-		local src = script:FindFirstChild(name)
-		
-		if not src then error("Objective not found.") end
-		
-		local mod = require(src)
-		
-		self[name] = setmetatable(mod, {
-			__call = mod.new
-		})
-		
-		return mod
-	end
-})
+local Objective = {
+	__index = {}
+}
 
 local prototype = Objective.__index
 
-function Objective.new(class, o)
-	local self = setmetatable(o or {}, class)
+local _abort = {}
+local _assign = {}
+local _cancel = {}
+local _complete = {}
+
+local _connected = {}
+
+function Objective.new(class, ...)
+	local abort = Instance.new("BindableEvent")
+	local assign = Instance.new("BindableEvent")
+	local cancel = Instance.new("BindableEvent")
+	local complete = Instance.new("BindableEvent")
 	
-	self.Connected = {}
+	local self = setmetatable({
+		OnAbort = abort.Event,
+		OnAssign = assign.Event,
+		OnCancel = cancel.Event,
+		OnComplete = complete.Event
+	}, class)
+	
+	_abort[self] = abort
+	_assign[self] = assign
+	_cancel[self] = cancel
+	_complete[self] = complete
+	
+	_connected[self] = {}
+	
+	self:new(...)
 	
 	return self
 end
 
-function prototype:Assign(player)
-	self:Disconnect(player)
-	self.Connected[player] = {}
-	self:OnAssign(player)
-end
-
-function prototype:Cancel(player)
-	self:Disconnect(player)
-	self:OnCancel(player)
-end
-
-function prototype:Complete(player)
-	self:Disconnect(player)
-	self:OnComplete(player)
-end
-
-function prototype:Disconnect(player)
-	local connected = self.Connected[player]
+function prototype:Abort(player)
+	local connected = _connected[self]
 	
-	if not connected then return end
+	if not connected[player] then
+		return
+	end
 	
-	self.Connected[player] = nil
+	_abort[self]:Fire(player)
 	
-	for _, conn in connected do
+	for event, conn in connected[player] do
 		if conn.Connected then
 			conn:Disconnect()
 		end
+		
+		connected[player][event] = nil
+	end
+	
+	connected[player] = nil
+end
+
+function prototype:Assign(player)
+	_connected[self][player] = {}
+	
+	_assign[self]:Fire(player)
+end
+
+function prototype:Cancel(player)
+	_cancel[self]:Fire(player)
+	
+	self:Abort(player)
+end
+
+function prototype:Complete(player)
+	_complete[self]:Fire(player)
+	
+	self:Abort(player)
+end
+
+function prototype:Connect(player, event, callback)
+	local connected = _connected[self]
+	
+	self:Disconnect(player, event)
+	
+	connected[player][event] = event:Connect(callback)
+end
+
+function prototype:Disconnect(player, event)
+	local connected = _connected[self]
+	
+	if not connected[player] then
+		return warn(`{player} not connected.`)
+	end
+	
+	local conn
+	
+	for i, e in connected[player] do
+		if i == event then
+			conn = e
+			connected[player][i] = nil
+			break
+		end
+	end
+	
+	if not conn then
+		return --warn(`{event} not connected.`)
+	end
+	
+	if conn.Connected then
+		conn:Disconnect()
 	end
 end
 
-function prototype:IsConnected(player)
-	return self.Connected[player] ~= nil
+function prototype:Destroy()
+	local connected = _connected[self]
+	
+	if not connected then
+		error("Objective is already destroyed.")
+	end
+	
+	for player in connected do
+		self:Abort(player)
+	end
+	
+	_abort[self], _assign[self], _cancel[self], _complete[self], _connected[self] = nil
 end
 
-function prototype:OnAssign(player) end
+function prototype:IsConnected(player)
+	return _connected[self][player] ~= nil
+end
 
-function prototype:OnCancel(player) end
+local QuestType = {
+	all = "IsAll",
+	any = "IsAny",
+	none = "IsNone"
+}
 
-function prototype:OnComplete(player) end
+setmetatable(Objective, {
+	__index = function (self, index)
+		local mod
+			
+		if QuestType[index] then
+			mod = {
+				__index = setmetatable({ [QuestType[index]] = true }, self.quest),
+				__tostring = function (self)
+					local tbl = {}
+					
+					for _, child in self.Children do
+						table.insert(tbl, tostring(child))
+					end
+					
+					return `{index}({table.concat(tbl, ", ")})`
+				end
+			}
+		else
+			local src = script[index]
+			
+			if not src then
+				error(`Objective {index} not found.`)
+			end
+			
+			mod = require(src)
+		end
+		
+		rawset(self, index, mod)
+		
+		setmetatable(mod, {
+			__call = self.new,
+			__tostring = function ()
+				return index
+			end
+		})
+		
+		return mod
+	end,
+	
+	__tostring = function ()
+		return "Objective"
+	end
+})
 
 return Objective

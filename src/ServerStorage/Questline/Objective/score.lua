@@ -1,36 +1,39 @@
 local Objective = require(script.Parent)
 
-local Score = { __index = {} }
-
-local prototype = setmetatable(Score.__index, Objective)
+local Score = { __index = setmetatable({}, Objective) }
+local prototype = Score.__index
 local super = Objective.__index
 
-function Score.new(_, statName, targetValue)
-	local self = Objective.new(Score, {
-		StatName = statName,
-		TargetValue = targetValue
-	})
-	
-	return self
+function Score:__tostring()
+	return `score({self.Duration})`
 end
 
-function prototype:Assign(player)
-	local leaderstats = player:FindFirstChild("leaderstats")
-	
-	if not leaderstats then error("Leaderstat folder not found.") end
-	
-	local intValue = leaderstats:FindFirstChild(self.StatName)
-	
-	if not intValue then error("Leaderstat not found.") end
-	
-	if self.TargetValue <= intValue.Value then return end
-	
+function prototype:new(statName, targetValue)
+	self.StatName = statName
+	self.TargetValue = targetValue
+end
+
+function prototype:Assign(player, parent)
 	super.Assign(self, player)
 	
-	local event = intValue.Changed
+	local target = parent or self
 	
-	self.Connected[player][event] = event:Connect(function (newValue)
-		if self.TargetValue <= newValue then
+	local leaderstats = player:FindFirstChild("leaderstats")
+	
+	if not leaderstats then
+		return error(`Leaderstats not found.`)
+	end
+	
+	local intVal = leaderstats:FindFirstChild(self.StatName)
+	
+	if not intVal then
+		return error(`{self.StatName} is not a leaderstat.`)
+	end
+	
+	target:Connect(player, intVal.Changed, function (newVal)
+		if self.TargetValue <= newVal then
+			target:Disconnect(player, intVal.Changed)
+			
 			self:Complete(player)
 		end
 	end)

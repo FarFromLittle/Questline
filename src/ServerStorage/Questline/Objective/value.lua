@@ -1,54 +1,40 @@
+local Questline = require(script.Parent.Parent)
 local Objective = require(script.Parent)
 
-local Value = { __index = {} }
-
-local prototype = setmetatable(Value.__index, Objective)
+local Value = { __index = setmetatable({}, Objective) }
+local prototype = Value.__index
 local super = Objective.__index
 
-function Value.new(_, intValue, targetValue)
-	local self = Objective.new(Value, {
-		IntValue = intValue,
-		TargetValue = targetValue
-	})
-	
-	return self
+function Value:__tostring()
+	return `value({self.StatName}, {self.TargetValue})`
 end
 
-local function getIntValue(path, parent)
-	if not parent then parent = game end
-	
-	local last = path:match("[%P]+$")
-	
-	for objName in path:gmatch("[^%p]+") do
-		local obj = parent:FindFirstChild(objName)
-		
-		if not obj then
-			obj = Instance.new(objName == last and "IntValue" or "Folder")
-			obj.Name = objName
-			obj.Parent = parent
-		end
-		
-		parent = obj
-	end
-	
-	return parent
+function prototype:new(statName, targetValue)
+	self.StatName = statName
+	self.TargetValue = targetValue
 end
 
-function prototype:Assign(player)
-	local intValue = self.IntValue
-	
-	if type(intValue) == "string" then
-		intValue = getIntValue(intValue, player)
-	end
-	
-	if self.TargetValue <= intValue.Value then return end
-	
+function prototype:Assign(player, parent)
 	super.Assign(self, player)
 	
-	local event = intValue.Changed
+	local target = parent or self
 	
-	self.Connected[player][event] = event:Connect(function (newValue)
-		if self.TargetValue <= newValue then
+	local playerstats = player:FindFirstChild("playerstats")
+	
+	if not playerstats then
+		return error(`Playerstats not found.`)
+	end
+	
+	local intVal = playerstats:FindFirstChild(self.StatName)
+	
+	if not intVal then
+		return error(`{self.StatName} is not a playerstat.`)
+	end
+	
+	target:Connect(player, intVal.Changed, function (newVal)
+		if self.TargetValue <= newVal then
+			target:Disconnect(player, intVal.Changed)
+			
 			self:Complete(player)
 		end
 	end)

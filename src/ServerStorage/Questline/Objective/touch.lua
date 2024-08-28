@@ -1,51 +1,35 @@
 local Objective = require(script.Parent)
 
-local Touch = { __index = {} }
-
-local prototype = setmetatable(Touch.__index, Objective)
+local touch = { __index = setmetatable({}, Objective) }
+local prototype = touch.__index
 local super = Objective.__index
 
-function Touch.new(_, touchPart, touchTarget, touchCount)
-	local self = Objective.new(Touch, {
-		TouchPart = touchPart
-	})
+touch.new = Objective.new
 
-	if touchTarget then
-		self.TouchTarget = touchTarget
-		self.TouchCount = touchCount or 1
-	end
-	
-	return self
+function touch:__tostring()
+	return `touch({self.TouchPart.Name})`
 end
 
-function prototype:Assign(player)
-	local target = self.TouchTarget
+function prototype:new(touchPart)
+	self.TouchPart = touchPart
+end
 
-	local function touched(otherPart)
-		if target then
-			if otherPart:HasTag(target) then
-				self:Complete(player)
-
-				return true
-			end
-		elseif otherPart.Parent == player.Character then
-			self:Complete(player)
-			
-			return true
-		end
-		
-		return false
-	end
-	
-	for _, part in self.TouchPart:GetTouchingParts() do
-		if touched(part) then return end
-	end
-	
+function prototype:Assign(player, parent)
 	super.Assign(self, player)
 	
-	local event = self.TouchPart.Touched
+	local target = parent or self
 	
-	self.Connected[player][event] = event:Connect(touched)
+	target:Connect(player, self.TouchPart.Touched, function (hitPart)
+		if self:Evaluate(player, hitPart) then
+			target:Disconnect(player, self.TouchPart.Touched)
+			
+			self:Complete(player)
+		end
+	end)
 end
 
-return Touch
+function prototype:Evaluate(player, hitPart)
+	return hitPart.Parent == player.Character
+end
+
+return touch

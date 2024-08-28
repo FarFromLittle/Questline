@@ -1,13 +1,16 @@
 <div align="center">
 
-# Quest<i>line</i>
+# [![Questline](images/banner.png)](https://github.com/FarFromLittle/QuestLine)
+
+Quest<i>line</i> is a free, server-sided Roblox module that aids in the creation and tracking of Quest<i>lines</i>.
+
+|Features include:|-
+|:-|:-:
+|Create Quest<i>lines</i> that automatically save.|❌
+|Event-driven, using native Roblox events.|✔️
+|Clean implementation that's easy to use.|✔️
+|Highly customizable and open-source.|✔️
+
+Check us out on [DevForums](https://devforum.roblox.com/t/questline-a-free-quest-creation-module).
 
 </div>
-
-Questline is a server-sided module script that aids in the creation and tracking of quests wtihin your game.  It offers a framework to create customized questlines that are event-driven and easily maintained.
-
-This module is intended for advanced developers, and requires a good understanding of lua scripting.
-
-Updates and examples coming soon.
-
-Check out the post on DevForums [here](https://devforum.roblox.com/t/questline-a-free-quest-creation-module).
