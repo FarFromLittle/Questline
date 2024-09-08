@@ -11,6 +11,6 @@ Quest<i>line</i> is a free, server-sided Roblox module that aids in the creation
 |Clean implementation that's easy to use.|✔️
 |Highly customizable and open-source.|✔️
 
-Check us out on [DevForums](https://devforum.roblox.com/t/questline-a-free-quest-creation-module).
+Check us out on [DevForums](https://devforum.roblox.com/t/project-questline/2076683).
 
 </div>
