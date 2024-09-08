@@ -82,14 +82,17 @@ Several objective types exist for use in your experience.
 Quest<i>lines</i> have several events associated with them, allowing developers to attach custom behaviour.
 
 ```lua
-myQuest.OnComplete:Connect(function (player)
+function myQuest:OnComplete(player)
 	print("Yay!,", player)
-end)
+end
 
-myQuest.OnCancel:Connect(function (player)
+function myQuest:OnCancel(player)
 	print(player, "failed!")
-end)
+end
 ```
+
+>#### 💡 Note:
+> Each event type can only be assigned to once.  Subsequent assignments will overwrite behavior.
 
 ### Event Types
 
@@ -98,10 +101,10 @@ The following event types are found on a Quest<i>line</i>.
 |BindableEvent|Arguments|Description
 |-:|:-:|:-
 |`OnAccept`|`(player)`| Fired when _player_ is assigned a Quest<i>line</i> for the first time.
-|`OnAssign`|`(player)`| Fired when _player_ is assigned, including subsequent sessions.
+|`OnAssign`|`(player, progress)`| Fired when _player_ is assigned, including subsequent sessions.
 |`OnCancel`|`(player)`| Fired with call to `Cancel`; triggered by `Objective.none`.
 |`OnComplete`|`(player)`| Fired when _player_ has completed the Quest<i>line</i>.
-|`OnProgress`|`(player, index)`| Fired when _player_ has completed an objective.
+|`OnProgress`|`(player, progress)`| Fired when _player_ has completed an objective.
 
 ## 🧲 Assigning Players
 

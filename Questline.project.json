@@ -1,0 +1,13 @@
+{
+	"name": "Questline",
+	
+	"tree": {
+		"$className": "DataModel",
+		
+		"ServerStorage": {
+			"Questline": {
+				"$path": "src/Questline"
+			}
+		}
+	}
+}
