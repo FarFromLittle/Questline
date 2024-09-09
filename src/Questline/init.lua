@@ -292,4 +292,6 @@ end
 
 function Questline:OnAccept(player) end
 
+function Questline:OnAssign(player) end
+
 return Questline

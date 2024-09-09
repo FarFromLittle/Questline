@@ -30,7 +30,6 @@ end
 
 function Touch:Disconnect(player)
 	local connected = _connected[self]
-	local touchPart = _touchPart[self]
 	
 	if not connected[player] then
 		return

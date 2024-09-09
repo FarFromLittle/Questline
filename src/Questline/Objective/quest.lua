@@ -1,6 +1,7 @@
 local Objective = require(script.Parent)
 
 local Quest = {}
+local super = Objective.__index
 
 local _children = {}
 local _complete = {}
@@ -14,32 +15,25 @@ Quest.IsQuest = true
 local function objCanceled(obj, player)
 	obj:Disconnect(player)
 	
-	local self = _parent[obj]
-	
-	local children = _children[self]
-	local complete = _complete[self][player]
-	
 	local index = _index[obj]
+	local parent = _parent[obj]
 	
-	if not complete then
-		return
-	end
+	local children = _children[parent]
+	local complete = _complete[parent][player]
 	
-	obj:OnCancel(obj, player)
+	task.defer(obj.OnCancel, obj, player)
 	
-	if self.IsAny then
+	if parent.IsAny then
 		complete[index] = true
 		
-		for i, obj in children do
+		for i in children do
 			if not complete[i] then
-				self:OnProgress(player, index)
-				
 				return
 			end
 		end
 	end
 	
-	self:Cancel(player)
+	parent:Cancel(player)
 end
 
 local function objComplete(obj, player)
@@ -51,7 +45,7 @@ local function objComplete(obj, player)
 	local children = _children[parent]
 	local complete = _complete[parent][player]
 	
-	obj:OnComplete(player)
+	task.defer(obj.OnComplete, obj, player)
 	
 	if parent.IsAny then
 		parent:Complete(player)
@@ -66,7 +60,7 @@ local function objComplete(obj, player)
 	if parent.IsAll or parent.IsNone then
 		for i, o in children do
 			if not(complete[i] or o.IsNone) then
-				parent:OnProgress(player, index)
+				task.defer(parent.OnProgress, parent, player, index)
 				
 				return
 			end
@@ -75,13 +69,13 @@ local function objComplete(obj, player)
 		return parent:Complete(player)
 	end
 	
-	-- Questline only
+	-- Begin Questline
 	parent:SetProgress(player, index)
 	
 	local nextObj = children[index + 1]
 	
 	if nextObj then
-		parent:OnProgress(player, index)
+		task.defer(parent.OnProgress, parent, player, index)
 		
 		nextObj:Connect(player)
 	else
@@ -123,8 +117,8 @@ function Quest:Connect(player, progress)
 	if not progress then
 		progress = 0
 	end
-	
-	self:Disconnect(player)
+
+	super.Connect(self, player, progress)
 	
 	local children = _children[self]
 	local complete = _complete[self]
@@ -135,15 +129,13 @@ function Quest:Connect(player, progress)
 		startIndex = 1
 		endIndex = #children
 	else
-		self:SetProgress(player, progress)
-		
 		startIndex = progress + 1
 		endIndex = startIndex
+		
+		self:SetProgress(player, progress)
 	end
 	
 	complete[player] = {}
-	
-	self:OnAssign(player, progress)
 	
 	for i = startIndex, endIndex do
 		children[i]:Connect(player)

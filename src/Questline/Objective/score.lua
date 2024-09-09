@@ -2,6 +2,7 @@ local Questline = require(script.Parent.Parent)
 local Objective = require(script.Parent)
 
 local Score = {}
+local super = Objective.__index
 
 local _connected = {}
 local _statName = {}
@@ -21,6 +22,8 @@ function Score:Connect(player)
 	local connected = _connected[self]
 	local statName = _statName[self]
 	local targetValue = _targetValue[self]
+
+	super.Connect(self, player)
 	
 	if targetValue <= Questline.getStat(player, statName) then
 		return self:Complete(player)

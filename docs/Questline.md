@@ -12,9 +12,17 @@ Objective hosts the various objective types within Quest<i>line</i>.
 
 Returns a quest found with the given _questId_.
 
+[`getStat`](#getstat)(_player_:`Player`, _statName_:`string`)➡️`number`
+
+Retrieves a _playerstat_ from the datastore.
+
 [`register`](#register)(_player_:`Player`)➡️`nil`
 
 Prepares player to receive questlines.  Loads player data from previous session.
+
+[`setStat`](#setstat)(_player_:`Player`, _statName_:`string`, _value_:`number`)➡️`nil`
+
+Saves a _playerstat_ to the datastore.
 
 [`unregister`](#unregister)(_player_:`Player`)➡️`nil`
 
@@ -66,7 +74,7 @@ Returns a boolean value indicating if the player is connected to the objective.
 
 Only fired once when _player_ is assigned a Quest<i>line</i>.
 
-[`OnAssign`](#onassign)(_player_:`Player`)➡️`nil`
+[`OnAssign`](#onassign)(_player_:`Player`, _progress_:`number`)➡️`nil`
 
 Callback handler that fires when a player is assigned this objective.
 

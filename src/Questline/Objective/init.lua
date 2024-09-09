@@ -5,7 +5,7 @@ export type Class = {
 	
 	click: (target:BasePart|Model) -> Objective,
 	event: (event:RBXScriptSignal) -> Objective,
-	quest: (questId:string) -> Objective,
+	--quest: (questId:string) -> Objective,
 	score: (leaderstat:string, targetValue:number) -> Objective,
 	timer: (timeDelay:number) -> Objective,
 	touch: (touchPart:BasePart) -> Objective,
@@ -62,7 +62,11 @@ function prototype:Complete(player)
 	self:OnComplete(player)
 end
 
-function prototype:Connect(player) end
+function prototype:Connect(player, progress)
+	self:Disconnect(player)
+	
+	task.defer(self.OnAssign, self, player, progress)
+end
 
 function prototype:Destroy() end
 

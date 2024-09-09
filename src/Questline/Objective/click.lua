@@ -1,17 +1,13 @@
 local Objective = require(script.Parent)
 
 local Click = {}
+local super = Objective.__index
 
 local _connected = {}
 local _detector = {}
-local _evaluate = {}
-
-local function default(player, target)
-	return player == target
-end
 
 function Click:__tostring()
-	return `click({self.ClickDetector})`
+	return `click({_detector[self]})`
 end
 
 function Click:new(partOrModel)
@@ -23,6 +19,8 @@ function Click:Connect(player)
 	local connected = _connected[self]
 	local detector = _detector[self]
 	
+	super.Connect(self, player)
+
 	connected[player] = detector.MouseClick:Connect(function (...)
 		if self:Evaluate(player, ...) then
 			self:Complete(player)
@@ -32,7 +30,6 @@ end
 
 function Click:Disconnect(player)
 	local connected = _connected[self]
-	local detector = _detector[self]
 	
 	if not connected[player] then
 		return

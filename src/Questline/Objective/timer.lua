@@ -1,6 +1,7 @@
 local Objective = require(script.Parent)
 
 local Timer = {}
+local super = Objective.__index
 
 local _connected = {}
 local _timeDelay = {}
@@ -18,6 +19,8 @@ function Timer:Connect(player)
 	local connected = _connected[self]
 	local timeDelay = _timeDelay[self]
 	
+	super.Connect(self, player)
+
 	if connected[player] then
 		self:Disconnect(player)
 	end
